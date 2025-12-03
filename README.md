@@ -1,5 +1,72 @@
 # GDLDV - Système de Gestion des Locations De Voitures
 
+## 🎯 Objectif
+Architecture microservices pour un système complet de gestion de locations de voitures.
+
+## 👥 Équipe
+- **Lakhat** - Leader + API Gateway + Infrastructure
+- **Coumba** - Vehicle Service (Catalogue Véhicules)
+- **Alassane** - User Service (Clients & Auth)
+- *Reservation Service - À déterminer*
+
+## 🏗️ Architecture
+API Gateway (Port 8000)
+├─ Vehicle Service (Port 8001) - Catalogue véhicules
+├─ Reservation Service (Port 8002) - Gestion réservations
+└─ User Service (Port 8003) - Clients & Authentification
+
+## 🚀 Démarrer le projet
+
+### Prérequis
+- JDK 21
+- Maven 3.9+
+- MySQL (WAMP)
+- Git
+
+### Installation
+```bash
+# Cloner
+git clone https://github.com/lakhat-dev/gdldv-microservices.git
+cd gdldv-microservices
+
+# Créer les bases MySQL
+# Via phpMyAdmin: http://localhost/phpmyadmin
+# Créer: gdldv_vehicle_db, gdldv_reservation_db, gdldv_user_db
+
+# Build
+mvn clean install
+
+# Lancer tous les services
+docker-compose up
+
+# Ou lancer individuellement
+cd vehicle-service && mvn spring-boot:run
+cd reservation-service && mvn spring-boot:run
+cd user-service && mvn spring-boot:run
+cd api-gateway && mvn spring-boot:run
+```
+
+## 📚 API Documentation
+
+- Vehicle Service Swagger: http://localhost:8001/swagger-ui.html
+- Reservation Service Swagger: http://localhost:8002/swagger-ui.html
+- User Service Swagger: http://localhost:8003/swagger-ui.html
+- API Gateway: http://localhost:8000/swagger-ui.html
+
+## 📋 Jira
+
+Tableau de bord: https://ad380914.atlassian.net/jira/software/projects/GDLDV
+
+## 📖 Guides
+- [Guide Microservices](./docs/GUIDE_MICROSERVICES.md)
+- [Configuration MySQL](./docs/MYSQL_CONFIG.md)
+- [Git Workflow](./docs/GIT_WORKFLOW.md)
+
+## 📝 License
+MIT
+
+# GDLDV - Système de Gestion des Locations De Voitures
+
 Système de gestion des locations de voitures basé sur une architecture microservices avec Spring Boot.
 
 ## Architecture
@@ -358,5 +425,6 @@ Projet de stage - 2025
 ## Licence
 
 Ce projet est destiné à un usage académique.
-#   g d l d v - m i c r o s e r v i c e s  
+#   g d l d v - m i c r o s e r v i c e s 
+ 
  
