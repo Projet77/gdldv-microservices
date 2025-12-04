@@ -7,57 +7,87 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "email")
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Le nom est obligatoire")
+    @NotBlank
+    @Size(max = 50)
     @Column(nullable = false)
     private String firstName;
 
-    @NotBlank(message = "Le prénom est obligatoire")
+    @NotBlank
+    @Size(max = 50)
     @Column(nullable = false)
     private String lastName;
 
-    @NotBlank(message = "L'email est obligatoire")
-    @Email(message = "L'email doit être valide")
-    @Column(unique = true, nullable = false)
+    @NotBlank
+    @Size(max = 100)
+    @Email
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @NotBlank(message = "Le mot de passe est obligatoire")
-    @Size(min = 6, message = "Le mot de passe doit contenir au moins 6 caractères")
+    @NotBlank
+    @Size(max = 120)
     @Column(nullable = false)
     private String password;
 
-    @Column(length = 20)
-    private String phoneNumber;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
 
-    @Column(length = 500)
-    private String address;
+    // UserDetails methods
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName().name()))
+                .collect(Collectors.toList());
+    }
 
-    @Column(nullable = false)
-    private String role = "USER"; // USER, ADMIN
+    @Override
+    public String getUsername() {
+        return email;
+    }
 
-    @Column(nullable = false)
-    private Boolean active = true;
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 
-    private LocalDateTime updatedAt;
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
