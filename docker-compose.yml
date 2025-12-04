@@ -1,0 +1,87 @@
+services:
+  eureka-server:
+    build: ./eureka-server
+    container_name: gdldv-eureka-server
+    ports:
+      - "8761:8761"
+    environment:
+      JAVA_OPTS: "-Xmx256m -Xms128m"
+    networks:
+      - gdldv-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: gdldv-api-gateway
+    ports:
+      - "8000:8000"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      JAVA_OPTS: "-Xmx256m -Xms128m"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    networks:
+      - gdldv-network
+
+  vehicle-service:
+    build: ./vehicle-service
+    container_name: gdldv-vehicle-service
+    ports:
+      - "8001:8001"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/gdldv_vehicle_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+      JAVA_OPTS: "-Xmx256m -Xms128m"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    networks:
+      - gdldv-network
+
+  user-service:
+    build: ./user-service
+    container_name: gdldv-user-service
+    ports:
+      - "8003:8003"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/gdldv_user_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+      JAVA_OPTS: "-Xmx256m -Xms128m"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    networks:
+      - gdldv-network
+
+  reservation-service:
+    build: ./reservation-service
+    container_name: gdldv-reservation-service
+    ports:
+      - "8002:8002"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/gdldv_reservation_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+      JAVA_OPTS: "-Xmx256m -Xms128m"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      FEIGN_CLIENT_CONFIG_VEHICLE-SERVICE_URL: http://vehicle-service:8001
+    networks:
+      - gdldv-network
+
+networks:
+  gdldv-network:
+    driver: bridge
