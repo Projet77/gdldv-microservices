@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.gdldv</groupId>
-    <artifactId>gdldv-project</artifactId>
+    <artifactId>gdldv-microservices</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
@@ -14,10 +14,10 @@
     <description>Microservices pour gestion de locations de voitures</description>
 
     <modules>
+        <module>api-gateway</module>
         <module>vehicle-service</module>
         <module>reservation-service</module>
         <module>user-service</module>
-        <module>api-gateway</module>
     </modules>
 
     <properties>
