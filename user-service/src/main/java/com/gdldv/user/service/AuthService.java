@@ -17,7 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.gdldv.user.repository.RoleRepository;
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthService {
@@ -35,6 +37,9 @@ public class AuthService {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     /**
      * GDLDV-443: Inscription d'un nouveau client
@@ -67,7 +72,7 @@ public class AuthService {
         user.setCity(registerRequest.getCity());
         user.setPostalCode(registerRequest.getPostalCode());
         user.setCountry(registerRequest.getCountry());
-        user.setRole(User.UserRole.CLIENT);
+        user.getRoles().add(roleRepository.findByName(com.gdldv.user.entity.Role.ERole.ROLE_CLIENT).orElseThrow(() -> new RuntimeException("Error: Role is not found.")));
         user.setActive(true);
         user.setEmailVerified(false);
 
@@ -83,9 +88,7 @@ public class AuthService {
                 jwt,
                 savedUser.getId(),
                 savedUser.getEmail(),
-                savedUser.getFirstName(),
-                savedUser.getLastName(),
-                savedUser.getRole()
+                savedUser.getRoles().stream().map(role -> role.getName().name()).collect(Collectors.toSet())
         );
     }
 
@@ -124,9 +127,7 @@ public class AuthService {
                 jwt,
                 user.getId(),
                 user.getEmail(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getRole()
+                user.getRoles().stream().map(role -> role.getName().name()).collect(Collectors.toSet())
         );
     }
 

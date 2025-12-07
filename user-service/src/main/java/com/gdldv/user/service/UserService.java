@@ -79,22 +79,24 @@ public class UserService {
 
     /**
      * GDLDV-463: Consulter historique des locations
-     * Note: Cette méthode retourne un placeholder pour l'instant.
-     * L'implémentation complète nécessitera l'intégration avec le service de réservation.
+     * Note: Cette méthode retourne un message indiquant que l'historique
+     * doit être récupéré via le rental-service
      */
     @Transactional(readOnly = true)
-    public List<Map<String, Object>> getRentalHistory() {
+    public Map<String, Object> getRentalHistory() {
         User user = getCurrentUser();
         logger.info("Consultation de l'historique des locations pour l'utilisateur: ID={}, Email={}", user.getId(), user.getEmail());
 
-        // TODO: Intégration avec le microservice de réservation
-        // Pour l'instant, retourne une liste vide
-        // À l'avenir, il faudra faire un appel REST au service de réservation:
-        // GET /reservation-service/api/reservations/user/{userId}
+        // L'historique des locations est géré par le rental-service
+        // Le client doit appeler directement : GET /rental-service/api/rentals/user/{userId}
 
-        logger.warn("L'historique des locations n'est pas encore implémenté. Intégration avec reservation-service nécessaire.");
+        logger.info("Redirection vers rental-service pour l'historique");
 
-        return List.of(); // Retourne une liste vide temporairement
+        return Map.of(
+                "message", "Pour consulter l'historique des locations, appelez GET /rental-service/api/rentals/user/" + user.getId(),
+                "userId", user.getId(),
+                "rentalServiceEndpoint", "/rental-service/api/rentals/user/" + user.getId()
+        );
     }
 
     /**

@@ -14,11 +14,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/vehicles")
-@RequiredArgsConstructor
 @Tag(name = "Vehicle", description = "API de gestion des véhicules")
 public class VehicleController {
 
     private final VehicleService vehicleService;
+
+    public VehicleController(VehicleService vehicleService) {
+        this.vehicleService = vehicleService;
+    }
 
     @GetMapping
     @Operation(summary = "Récupérer tous les véhicules")
@@ -77,5 +80,19 @@ public class VehicleController {
     public ResponseEntity<Void> deleteVehicle(@PathVariable Long id) {
         vehicleService.deleteVehicle(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/rent")
+    @Operation(summary = "Marquer un véhicule comme loué")
+    public ResponseEntity<Void> markVehicleAsRented(@PathVariable Long id) {
+        vehicleService.markVehicleAsRented(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/return")
+    @Operation(summary = "Marquer un véhicule comme disponible")
+    public ResponseEntity<Void> markVehicleAsAvailable(@PathVariable Long id) {
+        vehicleService.markVehicleAsAvailable(id);
+        return ResponseEntity.ok().build();
     }
 }

@@ -45,11 +45,11 @@ public class AuthController {
         } catch (RuntimeException e) {
             logger.error("Erreur lors de l'inscription: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponse<>(false, e.getMessage()));
+                    .body(new ApiResponse<>(false, e.getMessage(), null));
         } catch (Exception e) {
             logger.error("Erreur inattendue lors de l'inscription", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>(false, "Une erreur est survenue lors de l'inscription"));
+                    .body(new ApiResponse<>(false, "Une erreur est survenue lors de l'inscription", null));
         }
     }
 
@@ -71,11 +71,11 @@ public class AuthController {
         } catch (RuntimeException e) {
             logger.error("Erreur lors de la connexion: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse<>(false, "Email ou mot de passe incorrect"));
+                    .body(new ApiResponse<>(false, "Email ou mot de passe incorrect", null));
         } catch (Exception e) {
             logger.error("Erreur inattendue lors de la connexion", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>(false, "Une erreur est survenue lors de la connexion"));
+                    .body(new ApiResponse<>(false, "Une erreur est survenue lors de la connexion", null));
         }
     }
 
@@ -85,6 +85,6 @@ public class AuthController {
     @GetMapping("/health")
     @Operation(summary = "Health check", description = "Vérifier que le service d'authentification fonctionne")
     public ResponseEntity<?> healthCheck() {
-        return ResponseEntity.ok(new ApiResponse<>(true, "Service d'authentification opérationnel"));
+        return ResponseEntity.ok(new ApiResponse<>(true, "Service d'authentification opérationnel", null));
     }
 }

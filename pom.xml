@@ -18,6 +18,7 @@
         <module>reservation-service</module>
         <module>user-service</module>
         <module>api-gateway</module>
+        <module>rental-service</module>
     </modules>
 
     <properties>

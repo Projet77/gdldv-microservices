@@ -50,7 +50,7 @@ public class UserController {
         } catch (Exception e) {
             logger.error("Erreur lors de la récupération du profil", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>(false, "Une erreur est survenue lors de la récupération du profil"));
+                    .body(new ApiResponse<>(false, "Une erreur est survenue lors de la récupération du profil", null));
         }
     }
 
@@ -73,7 +73,7 @@ public class UserController {
         } catch (Exception e) {
             logger.error("Erreur lors de la mise à jour du profil", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>(false, "Une erreur est survenue lors de la mise à jour du profil"));
+                    .body(new ApiResponse<>(false, "Une erreur est survenue lors de la mise à jour du profil", null));
         }
     }
 
@@ -88,7 +88,7 @@ public class UserController {
         try {
             logger.info("Demande de consultation de l'historique des locations");
 
-            List<Map<String, Object>> history = userService.getRentalHistory();
+            Map<String, Object> history = userService.getRentalHistory();
 
             logger.info("Historique des locations récupéré avec succès");
             return ResponseEntity.ok(new ApiResponse<>(true, "Historique des locations récupéré avec succès", history));
@@ -96,7 +96,7 @@ public class UserController {
         } catch (Exception e) {
             logger.error("Erreur lors de la récupération de l'historique des locations", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>(false, "Une erreur est survenue lors de la récupération de l'historique"));
+                    .body(new ApiResponse<>(false, "Une erreur est survenue lors de la récupération de l'historique", null));
         }
     }
 
@@ -118,11 +118,11 @@ public class UserController {
         } catch (RuntimeException e) {
             logger.error("Utilisateur non trouvé: ID={}", id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse<>(false, e.getMessage()));
+                    .body(new ApiResponse<>(false, e.getMessage(), null));
         } catch (Exception e) {
             logger.error("Erreur lors de la récupération de l'utilisateur", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>(false, "Une erreur est survenue"));
+                    .body(new ApiResponse<>(false, "Une erreur est survenue", null));
         }
     }
 
@@ -144,7 +144,7 @@ public class UserController {
         } catch (Exception e) {
             logger.error("Erreur lors de la récupération des utilisateurs", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>(false, "Une erreur est survenue"));
+                    .body(new ApiResponse<>(false, "Une erreur est survenue", null)); // Ligne 147 corrigée
         }
     }
 
@@ -161,16 +161,40 @@ public class UserController {
 
             userService.deactivateUser(id);
 
-            return ResponseEntity.ok(new ApiResponse<>(true, "Utilisateur désactivé avec succès"));
+            return ResponseEntity.ok(new ApiResponse<>(true, "Utilisateur désactivé avec succès", null));
 
         } catch (RuntimeException e) {
             logger.error("Utilisateur non trouvé: ID={}", id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse<>(false, e.getMessage()));
+                    .body(new ApiResponse<>(false, e.getMessage(), null));
         } catch (Exception e) {
             logger.error("Erreur lors de la désactivation de l'utilisateur", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>(false, "Une erreur est survenue"));
+                    .body(new ApiResponse<>(false, "Une erreur est survenue", null));
+        }
+    }
+    /**
+     * Récupérer un utilisateur par ID (Usage interne)
+     * GET /api/users/internal/{id}
+     */
+    @GetMapping("/internal/{id}")
+    @Operation(summary = "Récupérer un utilisateur par ID (Usage interne)", description = "Récupérer les informations d'un utilisateur spécifique pour la communication inter-services")
+    public ResponseEntity<?> getUserByIdInternal(@PathVariable Long id) {
+        try {
+            logger.info("Demande de récupération de l'utilisateur avec ID: {} (interne)", id);
+
+            UserProfileResponse user = userService.getUserById(id);
+
+            return ResponseEntity.ok(new ApiResponse<>(true, "Utilisateur récupéré avec succès", user));
+
+        } catch (RuntimeException e) {
+            logger.error("Utilisateur non trouvé: ID={}", id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(false, e.getMessage(), null));
+        } catch (Exception e) {
+            logger.error("Erreur lors de la récupération de l'utilisateur (interne)", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>(false, "Une erreur est survenue", null));
         }
     }
 }

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .register-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        .register-container h2 {
+            margin-bottom: 20px;
+            color: #343a40;
+            text-align: center;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            width: 100%;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .text-center a {
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <h2>Inscription</h2>
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <p th:text="${errorMessage}"></p>
+        </div>
+        <div th:if="${successMessage}" class="alert alert-success">
+            <p th:text="${successMessage}"></p>
+        </div>
+        <form th:action="@{/register}" th:object="${registerRequest}" method="post">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="firstName">Prénom</label>
+                    <input type="text" id="firstName" th:field="*{firstName}" class="form-control" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="lastName">Nom</label>
+                    <input type="text" id="lastName" th:field="*{lastName}" class="form-control" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" th:field="*{email}" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" th:field="*{password}" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="phoneNumber">Numéro de téléphone</label>
+                <input type="tel" id="phoneNumber" th:field="*{phoneNumber}" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="drivingLicenseNumber">Numéro de permis de conduire</label>
+                <input type="text" id="drivingLicenseNumber" th:field="*{drivingLicenseNumber}" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="drivingLicenseCountry">Pays de délivrance du permis</label>
+                <input type="text" id="drivingLicenseCountry" th:field="*{drivingLicenseCountry}" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="drivingLicenseExpiryDate">Date d'expiration du permis</label>
+                <input type="date" id="drivingLicenseExpiryDate" th:field="*{drivingLicenseExpiryDate}" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Adresse</label>
+                <input type="text" id="address" th:field="*{address}" class="form-control" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="city">Ville</label>
+                    <input type="text" id="city" th:field="*{city}" class="form-control" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="postalCode">Code postal</label>
+                    <input type="text" id="postalCode" th:field="*{postalCode}" class="form-control" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="country">Pays</label>
+                <input type="text" id="country" th:field="*{country}" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">S'inscrire</button>
+        </form>
+        <div class="text-center mt-3">
+            Vous avez déjà un compte ? <a href="/login">Connectez-vous ici</a>.
+        </div>
+    </div>
+</body>
+</html>

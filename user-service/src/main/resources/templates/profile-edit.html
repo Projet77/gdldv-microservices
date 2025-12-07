@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier mon Profil</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 50px;
+        }
+        .edit-profile-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: auto;
+        }
+        .edit-profile-container h2 {
+            margin-bottom: 20px;
+            color: #343a40;
+            text-align: center;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="edit-profile-container">
+        <h2>Modifier mon Profil</h2>
+
+        <div th:if="${successMessage}" class="alert alert-success">
+            <p th:text="${successMessage}"></p>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
+        <form th:action="@{/profile/edit}" th:object="${updateProfileRequest}" method="post">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="firstName">Prénom</label>
+                    <input type="text" id="firstName" th:field="*{firstName}" class="form-control">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="lastName">Nom</label>
+                    <input type="text" id="lastName" th:field="*{lastName}" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="phoneNumber">Numéro de téléphone</label>
+                <input type="tel" id="phoneNumber" th:field="*{phoneNumber}" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="address">Adresse</label>
+                <input type="text" id="address" th:field="*{address}" class="form-control">
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="city">Ville</label>
+                    <input type="text" id="city" th:field="*{city}" class="form-control">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="postalCode">Code postal</label>
+                    <input type="text" id="postalCode" th:field="*{postalCode}" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="country">Pays</label>
+                <input type="text" id="country" th:field="*{country}" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+            <a th:href="@{/profile}" class="btn btn-secondary">Annuler</a>
+        </form>
+    </div>
+</body>
+</html>
