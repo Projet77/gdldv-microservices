@@ -10,10 +10,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class VehicleService {
 
     private final VehicleRepository vehicleRepository;
+
+    public VehicleService(VehicleRepository vehicleRepository) {
+        this.vehicleRepository = vehicleRepository;
+    }
 
     public List<Vehicle> getAllVehicles() {
         return vehicleRepository.findAll();
@@ -59,5 +62,21 @@ public class VehicleService {
     @Transactional
     public void deleteVehicle(Long id) {
         vehicleRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void markVehicleAsRented(Long id) {
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + id));
+        vehicle.setStatus("RENTED");
+        vehicleRepository.save(vehicle);
+    }
+
+    @Transactional
+    public void markVehicleAsAvailable(Long id) {
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + id));
+        vehicle.setStatus("AVAILABLE");
+        vehicleRepository.save(vehicle);
     }
 }
