@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import com.gdldv.user.dto.UserProfileResponse;
 import java.util.Map;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Controller
 public class WebController {
@@ -25,6 +27,25 @@ public class WebController {
     @Autowired
     private UserService userService; // Inject UserService
 
+    /**
+     * Vérifie si l'utilisateur est authentifié
+     */
+    private boolean isAuthenticated() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null
+            && authentication.isAuthenticated()
+            && !"anonymousUser".equals(authentication.getPrincipal());
+    }
+
+    @GetMapping("/")
+    public String home() {
+        // Si authentifié, aller au profil, sinon au login
+        if (isAuthenticated()) {
+            return "redirect:/profile";
+        }
+        return "redirect:/login";
+    }
+
     @GetMapping("/login")
     public String login() {
         return "login";
@@ -32,13 +53,18 @@ public class WebController {
 
     @GetMapping("/profile")
     public String profile(Model model) {
+        // Vérifier si l'utilisateur est authentifié
+        if (!isAuthenticated()) {
+            return "redirect:/login";
+        }
+
         try {
             UserProfileResponse userProfile = userService.getUserProfile();
             model.addAttribute("userProfile", userProfile);
             return "profile";
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Erreur lors du chargement du profil: " + e.getMessage());
-            return "profile"; // Ou rediriger vers une page d'erreur
+            return "redirect:/login";
         }
     }
 
@@ -62,6 +88,11 @@ public class WebController {
     
                 @GetMapping("/profile/edit")
                 public String editProfile(Model model) {
+                    // Vérifier si l'utilisateur est authentifié
+                    if (!isAuthenticated()) {
+                        return "redirect:/login";
+                    }
+
                     try {
                         UserProfileResponse userProfile = userService.getUserProfile();
                         UpdateProfileRequest updateProfileRequest = new UpdateProfileRequest();
@@ -76,12 +107,17 @@ public class WebController {
                         return "profile-edit";
                     } catch (Exception e) {
                         model.addAttribute("errorMessage", "Erreur lors du chargement du profil pour modification: " + e.getMessage());
-                        return "profile"; // Rediriger vers la page de profil avec erreur
+                        return "redirect:/login";
                     }
                 }
-    
+
                             @PostMapping("/profile/edit")
                             public String updateProfile(@ModelAttribute("updateProfileRequest") UpdateProfileRequest updateProfileRequest, Model model) {
+                                // Vérifier si l'utilisateur est authentifié
+                                if (!isAuthenticated()) {
+                                    return "redirect:/login";
+                                }
+
                                 try {
                                     userService.updateUserProfile(updateProfileRequest);
                                     model.addAttribute("successMessage", "Profil mis à jour avec succès !");
@@ -94,6 +130,11 @@ public class WebController {
                 
                                         @GetMapping("/rental-history")
                                         public String rentalHistory(Model model) {
+                                            // Vérifier si l'utilisateur est authentifié
+                                            if (!isAuthenticated()) {
+                                                return "redirect:/login";
+                                            }
+
                                             try {
                                                 Map<String, Object> history = userService.getRentalHistory();
                                                 // Ici, nous devrions normalement appeler le rental-service via FeignClient
@@ -102,36 +143,51 @@ public class WebController {
                                                 return "rental-history";
                                             } catch (Exception e) {
                                                 model.addAttribute("errorMessage", "Erreur lors de la récupération de l'historique des locations: " + e.getMessage());
-                                                return "rental-history"; // Ou rediriger vers une page d'erreur
+                                                return "redirect:/login";
                                             }
                                         }
-                            
+
                                                     @GetMapping("/admin/users")
                                                     public String listUsers(Model model) {
+                                                        // Vérifier si l'utilisateur est authentifié
+                                                        if (!isAuthenticated()) {
+                                                            return "redirect:/login";
+                                                        }
+
                                                         try {
                                                             List<UserProfileResponse> users = userService.getAllUsers();
                                                             model.addAttribute("users", users);
                                                             return "user-list";
                                                         } catch (Exception e) {
                                                             model.addAttribute("errorMessage", "Erreur lors de la récupération des utilisateurs: " + e.getMessage());
-                                                            return "user-list"; // Ou rediriger vers une page d'erreur
+                                                            return "redirect:/login";
                                                         }
                                                     }
-                                        
+
                                                                 @GetMapping("/admin/users/{id}")
                                                                 public String userDetails(@PathVariable Long id, Model model) {
+                                                                    // Vérifier si l'utilisateur est authentifié
+                                                                    if (!isAuthenticated()) {
+                                                                        return "redirect:/login";
+                                                                    }
+
                                                                     try {
                                                                         UserProfileResponse userProfile = userService.getUserById(id);
                                                                         model.addAttribute("userProfile", userProfile);
                                                                         return "user-details";
                                                                     } catch (Exception e) {
                                                                         model.addAttribute("errorMessage", "Erreur lors de la récupération des détails de l'utilisateur: " + e.getMessage());
-                                                                        return "user-details"; // Ou rediriger vers une page d'erreur
+                                                                        return "redirect:/login";
                                                                     }
                                                                 }
-                                                    
+
                                                                 @PostMapping("/admin/users/{id}/deactivate")
                                                                 public String deactivateUser(@PathVariable Long id, Model model) {
+                                                                    // Vérifier si l'utilisateur est authentifié
+                                                                    if (!isAuthenticated()) {
+                                                                        return "redirect:/login";
+                                                                    }
+
                                                                     try {
                                                                         userService.deactivateUser(id);
                                                                         model.addAttribute("successMessage", "Utilisateur désactivé avec succès !");
@@ -141,9 +197,14 @@ public class WebController {
                                                                         return "redirect:/admin/users/" + id;
                                                                     }
                                                                 }
-                                                    
+
                                                                 @PostMapping("/admin/users/{id}/activate")
                                                                 public String activateUser(@PathVariable Long id, Model model) {
+                                                                    // Vérifier si l'utilisateur est authentifié
+                                                                    if (!isAuthenticated()) {
+                                                                        return "redirect:/login";
+                                                                    }
+
                                                                     try {
                                                                         // Supposons que vous ayez une méthode activateUser dans UserService
                                                                         // userService.activateUser(id);
