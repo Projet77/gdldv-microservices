@@ -58,6 +58,23 @@ public class User implements UserDetails {
     private boolean emailVerified = false;
     private LocalDateTime lastLoginAt;
 
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
@@ -69,7 +86,7 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(Long id, String firstName, String lastName, String email, String password, String phoneNumber, String address, String city, String postalCode, String country, String drivingLicenseNumber, String drivingLicenseCountry, LocalDate drivingLicenseExpiryDate, boolean active, boolean emailVerified, LocalDateTime lastLoginAt, Set<Role> roles) {
+    public User(Long id, String firstName, String lastName, String email, String password, String phoneNumber, String address, String city, String postalCode, String country, String drivingLicenseNumber, String drivingLicenseCountry, LocalDate drivingLicenseExpiryDate, boolean active, boolean emailVerified, LocalDateTime lastLoginAt, LocalDateTime createdAt, LocalDateTime updatedAt, Set<Role> roles) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -86,6 +103,8 @@ public class User implements UserDetails {
         this.active = active;
         this.emailVerified = emailVerified;
         this.lastLoginAt = lastLoginAt;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
         this.roles = roles;
     }
 
@@ -217,6 +236,22 @@ public class User implements UserDetails {
 
     public void setLastLoginAt(LocalDateTime lastLoginAt) {
         this.lastLoginAt = lastLoginAt;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public Set<Role> getRoles() {
