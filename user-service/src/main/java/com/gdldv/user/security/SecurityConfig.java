@@ -14,6 +14,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -36,15 +38,22 @@ public class SecurityConfig {
     private AuthenticationProvider authenticationProvider;
 
     @Bean
+    public SecurityContextRepository securityContextRepository() {
+        return new HttpSessionSecurityContextRepository();
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable()) // Désactiver CSRF complètement pour simplifier
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // Utiliser IF_REQUIRED pour permettre les sessions pour les pages web
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                // Configurer le SecurityContextRepository pour sauvegarder dans la session
+                .securityContext(context -> context.securityContextRepository(securityContextRepository()))
                 .authorizeHttpRequests(auth -> auth
-                        // Pages web publiques (temporairement toutes publiques pour test)
-                        .requestMatchers("/", "/login", "/register", "/profile", "/profile/**",
-                                        "/rental-history", "/css/**", "/js/**", "/images/**").permitAll()
+                        // Pages publiques
+                        .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
 
                         // Endpoints API publics (authentification JWT)
                         .requestMatchers("/api/auth/**").permitAll()
@@ -55,6 +64,9 @@ public class SecurityConfig {
                         // Actuator (health checks)
                         .requestMatchers("/actuator/**").permitAll()
 
+                        // Pages web protégées (nécessitent authentification)
+                        .requestMatchers("/profile", "/profile/**", "/rental-history").authenticated()
+
                         // Admin pages (protégées)
                         .requestMatchers("/admin/**").hasAnyRole("ADMIN", "EMPLOYEE")
 
@@ -62,7 +74,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/**").authenticated()
 
                         // Tous les autres endpoints nécessitent authentification
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

@@ -17,8 +17,12 @@ import com.gdldv.user.dto.UserProfileResponse;
 import java.util.Map;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.bind.annotation.RequestParam;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 public class WebController {
@@ -28,6 +32,9 @@ public class WebController {
 
     @Autowired
     private UserService userService; // Inject UserService
+
+    @Autowired
+    private SecurityContextRepository securityContextRepository;
 
     /**
      * Vérifie si l'utilisateur est authentifié
@@ -54,11 +61,16 @@ public class WebController {
     }
 
     @PostMapping("/login")
-    public String loginSubmit(@RequestParam String email, @RequestParam String password, Model model) {
+    public String loginSubmit(@RequestParam String email, @RequestParam String password,
+                              HttpServletRequest request, HttpServletResponse response, Model model) {
         try {
             LoginRequest loginRequest = new LoginRequest(email, password);
             authService.authenticateUser(loginRequest);
-            // L'authentification est maintenant dans le SecurityContext
+
+            // Sauvegarder le SecurityContext dans la session HTTP
+            SecurityContext context = SecurityContextHolder.getContext();
+            securityContextRepository.saveContext(context, request, response);
+
             return "redirect:/profile";
         } catch (Exception e) {
             model.addAttribute("error", true);
