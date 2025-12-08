@@ -65,7 +65,7 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**").permitAll()
 
                         // Pages web protégées (nécessitent authentification)
-                        .requestMatchers("/profile", "/profile/**", "/rental-history").authenticated()
+                        .requestMatchers("/dashboard", "/logout", "/profile", "/profile/**", "/rental-history").authenticated()
 
                         // Admin pages (protégées)
                         .requestMatchers("/admin/**").hasAnyRole("ADMIN", "EMPLOYEE")

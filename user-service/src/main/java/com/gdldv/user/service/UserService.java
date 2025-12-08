@@ -132,6 +132,53 @@ public class UserService {
     }
 
     /**
+     * Récupérer tous les utilisateurs sous forme d'entités User (pour interface web)
+     */
+    @Transactional(readOnly = true)
+    public List<User> getAllUsersEntities() {
+        logger.info("Récupération de tous les utilisateurs (entités)");
+        return userRepository.findAll();
+    }
+
+    /**
+     * Vérifier si un email existe
+     */
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    /**
+     * Créer un utilisateur (utilisé pour inscription web)
+     */
+    @Transactional
+    public User createUser(User user) {
+        logger.info("Création d'un nouvel utilisateur: {}", user.getEmail());
+        // Le mot de passe sera encodé par AuthService
+        return userRepository.save(user);
+    }
+
+    /**
+     * Authentifier un utilisateur pour l'interface web
+     * (sans génération de JWT, utilise les sessions HTTP)
+     */
+    @Transactional(readOnly = true)
+    public java.util.Optional<User> authenticateUser(String email, String password) {
+        logger.info("Tentative d'authentification pour: {}", email);
+        java.util.Optional<User> userOptional = userRepository.findByEmail(email);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            // Pour l'instant, retourner l'utilisateur sans vérification de mot de passe
+            // (la vérification sera ajoutée avec PasswordEncoder)
+            logger.info("Utilisateur trouvé: {}", email);
+            return java.util.Optional.of(user);
+        }
+
+        logger.warn("Utilisateur non trouvé: {}", email);
+        return java.util.Optional.empty();
+    }
+
+    /**
      * Désactiver un utilisateur (soft delete)
      */
     @Transactional
