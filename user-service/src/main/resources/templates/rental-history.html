@@ -39,7 +39,14 @@
             <p th:text="${errorMessage}"></p>
         </div>
 
-        <div th:if="${rentalHistory != null and rentalHistory.rentals != null and rentalHistory.rentals.size() > 0}">
+        <!-- Message temporaire en attendant l'intégration avec rental-service -->
+        <div class="alert alert-info">
+            <h5>Fonctionnalité en cours de développement</h5>
+            <p>L'historique des locations sera disponible une fois le service de réservation (rental-service) intégré avec ce service utilisateur.</p>
+            <p>Pour le moment, vous pouvez consulter vos réservations via l'endpoint API: <code>GET /api/auth/reservations</code></p>
+        </div>
+
+        <div th:if="false">
             <table class="table table-striped">
                 <thead>
                     <tr>
