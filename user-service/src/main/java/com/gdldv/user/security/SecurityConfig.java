@@ -38,12 +38,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/api/**") // Désactiver CSRF pour les API REST
+                )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Endpoints publics (authentification)
-                        .requestMatchers("/api/auth/**", "/login", "/register").permitAll()
+                        // Pages web publiques
+                        .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
+
+                        // Endpoints API publics (authentification JWT)
+                        .requestMatchers("/api/auth/**").permitAll()
 
                         // Swagger / OpenAPI
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
@@ -51,20 +55,24 @@ public class SecurityConfig {
                         // Actuator (health checks)
                         .requestMatchers("/actuator/**").permitAll()
 
-                        // Tous les autres endpoints nécessitent une authentification
-                        .requestMatchers("/api/users/**").authenticated()
+                        // Endpoints API protégés (nécessitent JWT)
+                        .requestMatchers("/api/**").authenticated()
+
+                        // Pages web protégées (nécessitent session)
+                        .requestMatchers("/profile/**", "/rental-history", "/admin/**").authenticated()
+
+                        // Tous les autres
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .loginProcessingUrl("/login") // URL to submit the username and password to
-                        .defaultSuccessUrl("/profile", true) // Redirect to /profile after successful login
-                        .failureUrl("/login?error") // Redirect to /login?error after failed login
+                        .defaultSuccessUrl("/profile", true)
+                        .failureUrl("/login?error")
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout") // Redirect to /login?logout after successful logout
+                        .logoutSuccessUrl("/login?logout")
                         .permitAll()
                 )
                 .authenticationProvider(authenticationProvider)
