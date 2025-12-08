@@ -46,10 +46,10 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
-    // NOM CORRIGÉ DE LA MÉTHODE
     public String getUsernameFromJwtToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key()).build()
+        return Jwts.parserBuilder()
                 .setSigningKey(key())
+                .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
@@ -57,8 +57,9 @@ public class JwtUtils {
 
     public boolean validateJwtToken(String authToken) {
         try {
-            Jwts.parserBuilder().setSigningKey(key()).build()
+            Jwts.parserBuilder()
                     .setSigningKey(key())
+                    .build()
                     .parseClaimsJws(authToken);
             return true;
         } catch (MalformedJwtException e) {
