@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.gdldv.user.dto.RegisterRequest;
+import com.gdldv.user.dto.LoginRequest;
 import com.gdldv.user.service.UserService;
 import com.gdldv.user.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import java.util.Map;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class WebController {
@@ -49,6 +51,20 @@ public class WebController {
     @GetMapping("/login")
     public String login() {
         return "login";
+    }
+
+    @PostMapping("/login")
+    public String loginSubmit(@RequestParam String email, @RequestParam String password, Model model) {
+        try {
+            LoginRequest loginRequest = new LoginRequest(email, password);
+            authService.authenticateUser(loginRequest);
+            // L'authentification est maintenant dans le SecurityContext
+            return "redirect:/profile";
+        } catch (Exception e) {
+            model.addAttribute("error", true);
+            model.addAttribute("errorMessage", "Email ou mot de passe incorrect");
+            return "login";
+        }
     }
 
     @GetMapping("/profile")
