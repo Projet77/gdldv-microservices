@@ -1,12 +1,18 @@
 package com.gdldv.user.service;
 
+import com.gdldv.user.dto.ReservationResponse;
 import com.gdldv.user.dto.UpdateProfileRequest;
 import com.gdldv.user.dto.UserProfileResponse;
+import com.gdldv.user.entity.Reservation;
+import com.gdldv.user.entity.ReservationStatus;
 import com.gdldv.user.entity.User;
+import com.gdldv.user.repository.ReservationRepository;
 import com.gdldv.user.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -22,6 +28,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     /**
      * GDLDV-458: Consulter son profil
@@ -144,5 +153,53 @@ public class UserService {
 
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+    }
+
+    /**
+     * GDLDV-463: Récupérer les réservations d'un utilisateur avec pagination
+     */
+    @Transactional(readOnly = true)
+    public Page<ReservationResponse> getUserReservations(Long userId, Pageable pageable) {
+        logger.info("Récupération des réservations pour l'utilisateur: ID={}", userId);
+        return reservationRepository.findByUserId(userId, pageable)
+                .map(this::mapReservationToResponse);
+    }
+
+    /**
+     * GDLDV-463: Récupérer les réservations d'un utilisateur par status avec pagination
+     */
+    @Transactional(readOnly = true)
+    public Page<ReservationResponse> getUserReservationsByStatus(
+            Long userId, String status, Pageable pageable) {
+        logger.info("Récupération des réservations pour l'utilisateur: ID={} avec status: {}", userId, status);
+
+        ReservationStatus reservationStatus;
+        try {
+            reservationStatus = ReservationStatus.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            logger.error("Status de réservation invalide: {}", status);
+            throw new RuntimeException("Status de réservation invalide: " + status);
+        }
+
+        return reservationRepository.findByUserIdAndStatus(userId, reservationStatus, pageable)
+                .map(this::mapReservationToResponse);
+    }
+
+    /**
+     * Mapper une Reservation vers ReservationResponse
+     */
+    private ReservationResponse mapReservationToResponse(Reservation reservation) {
+        return ReservationResponse.builder()
+                .id(reservation.getId())
+                .confirmationNumber(reservation.getConfirmationNumber())
+                .vehicleId(reservation.getVehicleId())
+                .vehicleBrand(reservation.getVehicleBrand())
+                .vehicleModel(reservation.getVehicleModel())
+                .startDate(reservation.getStartDate())
+                .endDate(reservation.getEndDate())
+                .totalPrice(reservation.getTotalPrice())
+                .status(reservation.getStatus().toString())
+                .createdAt(reservation.getCreatedAt())
+                .build();
     }
 }

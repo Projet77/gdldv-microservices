@@ -4,7 +4,10 @@ import com.gdldv.user.dto.ApiResponse;
 import com.gdldv.user.dto.AuthResponse;
 import com.gdldv.user.dto.LoginRequest;
 import com.gdldv.user.dto.RegisterRequest;
+import com.gdldv.user.dto.ReservationResponse;
+import com.gdldv.user.security.JwtUtils;
 import com.gdldv.user.service.AuthService;
+import com.gdldv.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -25,6 +28,12 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
     /**
      * GDLDV-443: Inscription d'un nouveau client
@@ -76,6 +85,62 @@ public class AuthController {
             logger.error("Erreur inattendue lors de la connexion", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ApiResponse<>(false, "Une erreur est survenue lors de la connexion", null));
+        }
+    }
+
+    /**
+     * GDLDV-463: Consulter l'historique des réservations
+     * GET /api/auth/reservations
+     */
+    @GetMapping("/reservations")
+    @Operation(summary = "Consulter l'historique des réservations", description = "Récupérer l'historique des réservations de l'utilisateur connecté avec pagination (GDLDV-463)")
+    public ResponseEntity<?> getUserReservations(
+            @RequestHeader("Authorization") String token,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String status) {
+        try {
+            logger.info("Demande de consultation de l'historique des réservations");
+
+            // Extraire le token du header
+            String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+
+            // Valider le token
+            if (!jwtUtils.validateJwtToken(jwtToken)) {
+                logger.warn("Token JWT invalide");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ApiResponse<>(false, "Token invalide ou expiré", null));
+            }
+
+            // Extraire l'email et récupérer l'utilisateur
+            String email = jwtUtils.getUsernameFromJwtToken(jwtToken);
+            Long userId = authService.getCurrentUser().getId();
+
+            logger.info("Récupération des réservations pour l'utilisateur: ID={}", userId);
+
+            // Créer le Pageable
+            org.springframework.data.domain.Pageable pageable =
+                org.springframework.data.domain.PageRequest.of(page, size);
+
+            // Récupérer les réservations
+            org.springframework.data.domain.Page<ReservationResponse> reservations;
+            if (status != null && !status.isEmpty()) {
+                reservations = userService.getUserReservationsByStatus(userId, status, pageable);
+            } else {
+                reservations = userService.getUserReservations(userId, pageable);
+            }
+
+            logger.info("Réservations récupérées avec succès: {} éléments", reservations.getTotalElements());
+            return ResponseEntity.ok(new ApiResponse<>(true, "Historique des réservations récupéré avec succès", reservations));
+
+        } catch (RuntimeException e) {
+            logger.error("Erreur lors de la récupération de l'historique: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse<>(false, e.getMessage(), null));
+        } catch (Exception e) {
+            logger.error("Erreur inattendue lors de la récupération de l'historique", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>(false, "Une erreur est survenue lors de la récupération de l'historique", null));
         }
     }
 
