@@ -46,7 +46,8 @@
             <p>Pour le moment, vous pouvez consulter vos réservations via l'endpoint API: <code>GET /api/auth/reservations</code></p>
         </div>
 
-        <div th:if="false">
+        <!-- Le tableau sera implémenté lors de l'intégration avec rental-service
+        <div>
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -70,9 +71,7 @@
                 </tbody>
             </table>
         </div>
-        <div th:if="${rentalHistory == null or rentalHistory.rentals == null or rentalHistory.rentals.size() == 0}" class="alert alert-info">
-            Aucune location trouvée.
-        </div>
+        -->
 
         <div class="text-center">
             <a th:href="@{/profile}" class="btn btn-secondary btn-back">Retour au profil</a>
