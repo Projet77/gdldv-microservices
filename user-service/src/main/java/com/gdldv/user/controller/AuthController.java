@@ -134,7 +134,7 @@ public class AuthController {
 
         // Ajouter la liste des utilisateurs pour les admins
         if ("ADMIN".equals(currentUser.getRole())) {
-            model.addAttribute("users", userService.getAllUsers());
+            model.addAttribute("users", userService.getAllUsersEntities());
         }
 
         return "user/dashboard";
