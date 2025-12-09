@@ -302,4 +302,20 @@ public class User implements UserDetails {
     public Boolean getEmailVerified() {
         return emailVerified;
     }
+
+    // Helper methods for role (for backward compatibility with web interface)
+    public String getRole() {
+        if (roles == null || roles.isEmpty()) {
+            return null;
+        }
+        // Return the first role's name
+        return roles.iterator().next().getName().name();
+    }
+
+    public void setRole(String roleName) {
+        // This method is for backward compatibility
+        // In production, use setRoles() with proper Role entities
+        // For now, we'll just log a warning
+        System.out.println("Warning: setRole() called with: " + roleName + ". Use setRoles() instead.");
+    }
 }
