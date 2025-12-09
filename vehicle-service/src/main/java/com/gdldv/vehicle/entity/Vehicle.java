@@ -3,9 +3,19 @@ package com.gdldv.vehicle.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "vehicles")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Vehicle {
 
     @Id
@@ -24,6 +34,10 @@ public class Vehicle {
     @Column(unique = true, nullable = false)
     private String licensePlate;
 
+    private String color;
+
+    private Integer year;
+
     @Positive(message = "Le kilométrage doit être positif")
     private Long mileage;
 
@@ -33,84 +47,40 @@ public class Vehicle {
 
     private String category; // SUV, Berline, Monospace, etc.
 
-    @Column(columnDefinition = "VARCHAR(255) DEFAULT 'AVAILABLE'")
-    private String status; // AVAILABLE, RENTED, MAINTENANCE
+    private String fuelType; // ESSENCE, DIESEL, ELECTRIQUE, HYBRIDE
 
-    public Vehicle() {
+    private String transmission; // MANUELLE, AUTOMATIQUE
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private VehicleStatus status;
+
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        if (this.isActive == null) {
+            this.isActive = true;
+        }
+        if (this.status == null) {
+            this.status = VehicleStatus.AVAILABLE;
+        }
     }
 
-    public Vehicle(Long id, String brand, String model, String licensePlate, Long mileage, Double dailyPrice, String category, String status) {
-        this.id = id;
-        this.brand = brand;
-        this.model = model;
-        this.licensePlate = licensePlate;
-        this.mileage = mileage;
-        this.dailyPrice = dailyPrice;
-        this.category = category;
-        this.status = status;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getBrand() {
-        return brand;
-    }
-
-    public void setBrand(String brand) {
-        this.brand = brand;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
-    public String getLicensePlate() {
-        return licensePlate;
-    }
-
-    public void setLicensePlate(String licensePlate) {
-        this.licensePlate = licensePlate;
-    }
-
-    public Long getMileage() {
-        return mileage;
-    }
-
-    public void setMileage(Long mileage) {
-        this.mileage = mileage;
-    }
-
-    public Double getDailyPrice() {
-        return dailyPrice;
-    }
-
-    public void setDailyPrice(Double dailyPrice) {
-        this.dailyPrice = dailyPrice;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 }
