@@ -4,14 +4,18 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "vehicles")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Vehicle {
 
     @Id
@@ -30,6 +34,10 @@ public class Vehicle {
     @Column(unique = true, nullable = false)
     private String licensePlate;
 
+    private String color;
+
+    private Integer year;
+
     @Positive(message = "Le kilométrage doit être positif")
     private Long mileage;
 
@@ -39,6 +47,40 @@ public class Vehicle {
 
     private String category; // SUV, Berline, Monospace, etc.
 
-    @Column(columnDefinition = "VARCHAR(255) DEFAULT 'AVAILABLE'")
-    private String status; // AVAILABLE, RENTED, MAINTENANCE
+    private String fuelType; // ESSENCE, DIESEL, ELECTRIQUE, HYBRIDE
+
+    private String transmission; // MANUELLE, AUTOMATIQUE
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private VehicleStatus status;
+
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        if (this.isActive == null) {
+            this.isActive = true;
+        }
+        if (this.status == null) {
+            this.status = VehicleStatus.AVAILABLE;
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

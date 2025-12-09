@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Profil</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 50px;
+        }
+        .profile-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: auto;
+        }
+        .profile-container h2 {
+            margin-bottom: 20px;
+            color: #343a40;
+            text-align: center;
+        }
+        .profile-info p {
+            margin-bottom: 10px;
+        }
+        .profile-info strong {
+            width: 150px;
+            display: inline-block;
+        }
+        .btn-group {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .btn-group a {
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <h2>Mon Profil</h2>
+
+        <div th:if="${successMessage}" class="alert alert-success">
+            <p th:text="${successMessage}"></p>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
+        <div class="profile-info" th:object="${userProfile}">
+            <p><strong>Prénom:</strong> <span th:text="*{firstName}"></span></p>
+            <p><strong>Nom:</strong> <span th:text="*{lastName}"></span></p>
+            <p><strong>Email:</strong> <span th:text="*{email}"></span></p>
+            <p><strong>Téléphone:</strong> <span th:text="*{phoneNumber}"></span></p>
+            <p><strong>Numéro de permis:</strong> <span th:text="*{drivingLicenseNumber}"></span></p>
+            <p><strong>Pays du permis:</strong> <span th:text="*{drivingLicenseCountry}"></span></p>
+            <p><strong>Expiration permis:</strong> <span th:text="*{drivingLicenseExpiryDate}"></span></p>
+            <p><strong>Adresse:</strong> <span th:text="*{address}"></span></p>
+            <p><strong>Ville:</strong> <span th:text="*{city}"></span></p>
+            <p><strong>Code Postal:</strong> <span th:text="*{postalCode}"></span></p>
+            <p><strong>Pays:</strong> <span th:text="*{country}"></span></p>
+            <p><strong>Rôles:</strong> <span th:text="*{roles}"></span></p>
+            <p><strong>Actif:</strong> <span th:text="*{active ? 'Oui' : 'Non'}"></span></p>
+            <p><strong>Email Vérifié:</strong> <span th:text="*{emailVerified ? 'Oui' : 'Non'}"></span></p>
+            <p><strong>Dernière connexion:</strong> <span th:text="*{lastLoginAt}"></span></p>
+        </div>
+
+        <div class="btn-group">
+            <a th:href="@{/profile/edit}" class="btn btn-info">Modifier le profil</a>
+            <a th:href="@{/rental-history}" class="btn btn-primary">Voir l'historique des locations</a>
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-danger">Déconnexion</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

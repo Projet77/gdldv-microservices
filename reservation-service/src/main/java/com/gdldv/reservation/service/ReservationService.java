@@ -200,6 +200,22 @@ public class ReservationService {
         return reservation.getTotalPrice() * refundPercentage;
     }
 
+    @Transactional
+    public void confirmReservation(Long id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + id));
+        reservation.setStatus(ReservationStatus.CONFIRMED);
+        reservationRepository.save(reservation);
+    }
+
+    @Transactional
+    public void completeReservation(Long id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + id));
+        reservation.setStatus(ReservationStatus.COMPLETED);
+        reservationRepository.save(reservation);
+    }
+
     public boolean isVehicleAvailable(Long vehicleId, LocalDate startDate, LocalDate endDate) {
         List<Reservation> existingReservations = reservationRepository
                 .findByVehicleIdAndStartDateBetween(vehicleId, startDate, endDate);

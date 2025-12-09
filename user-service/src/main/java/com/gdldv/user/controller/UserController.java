@@ -1,81 +1,200 @@
 package com.gdldv.user.controller;
 
-import com.gdldv.user.entity.User;
+import com.gdldv.user.dto.ApiResponse;
+import com.gdldv.user.dto.UpdateProfileRequest;
+import com.gdldv.user.dto.UserProfileResponse;
 import com.gdldv.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/users")
-@RequiredArgsConstructor
-@Tag(name = "User", description = "API de gestion des utilisateurs")
+@RequestMapping("/api/users")
+@Tag(name = "Utilisateurs", description = "API de gestion des profils utilisateurs (ÉPIC-3)")
+@SecurityRequirement(name = "Bearer Authentication")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class UserController {
 
-    private final UserService userService;
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    @GetMapping
-    @Operation(summary = "Récupérer tous les utilisateurs")
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
-    }
+    @Autowired
+    private UserService userService;
 
-    @GetMapping("/{id}")
-    @Operation(summary = "Récupérer un utilisateur par ID")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        return userService.getUserById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @GetMapping("/email/{email}")
-    @Operation(summary = "Récupérer un utilisateur par email")
-    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
-        return userService.getUserByEmail(email)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @GetMapping("/role/{role}")
-    @Operation(summary = "Récupérer les utilisateurs par rôle")
-    public ResponseEntity<List<User>> getUsersByRole(@PathVariable String role) {
-        return ResponseEntity.ok(userService.getUsersByRole(role));
-    }
-
-    @GetMapping("/exists/{email}")
-    @Operation(summary = "Vérifier si un email existe")
-    public ResponseEntity<Boolean> existsByEmail(@PathVariable String email) {
-        return ResponseEntity.ok(userService.existsByEmail(email));
-    }
-
-    @PostMapping
-    @Operation(summary = "Créer un nouvel utilisateur")
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-        User createdUser = userService.createUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-    }
-
-    @PutMapping("/{id}")
-    @Operation(summary = "Mettre à jour un utilisateur")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @Valid @RequestBody User user) {
+    /**
+     * GDLDV-458: Consulter son profil
+     * GET /api/users/profile
+     */
+    @GetMapping("/profile")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Consulter son profil", description = "Récupérer les informations du profil de l'utilisateur connecté (GDLDV-458)")
+    public ResponseEntity<?> getUserProfile() {
         try {
-            User updatedUser = userService.updateUser(id, user);
-            return ResponseEntity.ok(updatedUser);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            logger.info("Demande de consultation du profil");
+
+            UserProfileResponse profile = userService.getUserProfile();
+
+            logger.info("Profil récupéré avec succès pour l'utilisateur: ID={}", profile.getId());
+            return ResponseEntity.ok(new ApiResponse<>(true, "Profil récupéré avec succès", profile));
+
+        } catch (Exception e) {
+            logger.error("Erreur lors de la récupération du profil", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>(false, "Une erreur est survenue lors de la récupération du profil", null));
         }
     }
 
+    /**
+     * GDLDV-458: Modifier son profil
+     * PUT /api/users/profile
+     */
+    @PutMapping("/profile")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Modifier son profil", description = "Mettre à jour les informations du profil de l'utilisateur connecté (GDLDV-458)")
+    public ResponseEntity<?> updateUserProfile(@Valid @RequestBody UpdateProfileRequest updateRequest) {
+        try {
+            logger.info("Demande de mise à jour du profil");
+
+            UserProfileResponse updatedProfile = userService.updateUserProfile(updateRequest);
+
+            logger.info("Profil mis à jour avec succès pour l'utilisateur: ID={}", updatedProfile.getId());
+            return ResponseEntity.ok(new ApiResponse<>(true, "Profil mis à jour avec succès", updatedProfile));
+
+        } catch (Exception e) {
+            logger.error("Erreur lors de la mise à jour du profil", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>(false, "Une erreur est survenue lors de la mise à jour du profil", null));
+        }
+    }
+
+    /**
+     * GDLDV-463: Consulter historique des locations
+     * GET /api/users/rental-history
+     */
+    @GetMapping("/rental-history")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Consulter l'historique des locations", description = "Récupérer l'historique des locations de l'utilisateur connecté (GDLDV-463)")
+    public ResponseEntity<?> getRentalHistory() {
+        try {
+            logger.info("Demande de consultation de l'historique des locations");
+
+            Map<String, Object> history = userService.getRentalHistory();
+
+            logger.info("Historique des locations récupéré avec succès");
+            return ResponseEntity.ok(new ApiResponse<>(true, "Historique des locations récupéré avec succès", history));
+
+        } catch (Exception e) {
+            logger.error("Erreur lors de la récupération de l'historique des locations", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>(false, "Une erreur est survenue lors de la récupération de l'historique", null));
+        }
+    }
+
+    /**
+     * Récupérer un utilisateur par ID (Admin uniquement)
+     * GET /api/users/{id}
+     */
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
+    @Operation(summary = "Récupérer un utilisateur par ID", description = "Récupérer les informations d'un utilisateur spécifique (Admin/Employé)")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        try {
+            logger.info("Demande de récupération de l'utilisateur avec ID: {}", id);
+
+            UserProfileResponse user = userService.getUserById(id);
+
+            return ResponseEntity.ok(new ApiResponse<>(true, "Utilisateur récupéré avec succès", user));
+
+        } catch (RuntimeException e) {
+            logger.error("Utilisateur non trouvé: ID={}", id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(false, e.getMessage(), null));
+        } catch (Exception e) {
+            logger.error("Erreur lors de la récupération de l'utilisateur", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>(false, "Une erreur est survenue", null));
+        }
+    }
+
+    /**
+     * Récupérer tous les utilisateurs (Admin uniquement)
+     * GET /api/users
+     */
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Récupérer tous les utilisateurs", description = "Liste de tous les utilisateurs (Admin uniquement)")
+    public ResponseEntity<?> getAllUsers() {
+        try {
+            logger.info("Demande de récupération de tous les utilisateurs");
+
+            List<UserProfileResponse> users = userService.getAllUsers();
+
+            return ResponseEntity.ok(new ApiResponse<>(true, "Utilisateurs récupérés avec succès", users));
+
+        } catch (Exception e) {
+            logger.error("Erreur lors de la récupération des utilisateurs", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>(false, "Une erreur est survenue", null)); // Ligne 147 corrigée
+        }
+    }
+
+    /**
+     * Désactiver un utilisateur (Admin uniquement)
+     * DELETE /api/users/{id}
+     */
     @DeleteMapping("/{id}")
-    @Operation(summary = "Supprimer un utilisateur")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Désactiver un utilisateur", description = "Désactiver un compte utilisateur (soft delete) (Admin uniquement)")
+    public ResponseEntity<?> deactivateUser(@PathVariable Long id) {
+        try {
+            logger.info("Demande de désactivation de l'utilisateur avec ID: {}", id);
+
+            userService.deactivateUser(id);
+
+            return ResponseEntity.ok(new ApiResponse<>(true, "Utilisateur désactivé avec succès", null));
+
+        } catch (RuntimeException e) {
+            logger.error("Utilisateur non trouvé: ID={}", id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(false, e.getMessage(), null));
+        } catch (Exception e) {
+            logger.error("Erreur lors de la désactivation de l'utilisateur", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>(false, "Une erreur est survenue", null));
+        }
+    }
+    /**
+     * Récupérer un utilisateur par ID (Usage interne)
+     * GET /api/users/internal/{id}
+     */
+    @GetMapping("/internal/{id}")
+    @Operation(summary = "Récupérer un utilisateur par ID (Usage interne)", description = "Récupérer les informations d'un utilisateur spécifique pour la communication inter-services")
+    public ResponseEntity<?> getUserByIdInternal(@PathVariable Long id) {
+        try {
+            logger.info("Demande de récupération de l'utilisateur avec ID: {} (interne)", id);
+
+            UserProfileResponse user = userService.getUserById(id);
+
+            return ResponseEntity.ok(new ApiResponse<>(true, "Utilisateur récupéré avec succès", user));
+
+        } catch (RuntimeException e) {
+            logger.error("Utilisateur non trouvé: ID={}", id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(false, e.getMessage(), null));
+        } catch (Exception e) {
+            logger.error("Erreur lors de la récupération de l'utilisateur (interne)", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>(false, "Une erreur est survenue", null));
+        }
     }
 }

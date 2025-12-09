@@ -102,4 +102,18 @@ public class ReservationController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
+
+    @PutMapping("/{id}/confirm")
+    @Operation(summary = "Confirmer une réservation")
+    public ResponseEntity<Void> confirmReservation(@PathVariable Long id) {
+        reservationService.confirmReservation(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/complete")
+    @Operation(summary = "Clôturer une réservation")
+    public ResponseEntity<Void> completeReservation(@PathVariable Long id) {
+        reservationService.completeReservation(id);
+        return ResponseEntity.ok().build();
+    }
 }
