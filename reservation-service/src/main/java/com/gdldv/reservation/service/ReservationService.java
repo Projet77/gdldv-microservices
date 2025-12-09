@@ -83,6 +83,22 @@ public class ReservationService {
         reservationRepository.deleteById(id);
     }
 
+    @Transactional
+    public void confirmReservation(Long id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + id));
+        reservation.setStatus("CONFIRMED");
+        reservationRepository.save(reservation);
+    }
+
+    @Transactional
+    public void completeReservation(Long id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + id));
+        reservation.setStatus("COMPLETED");
+        reservationRepository.save(reservation);
+    }
+
     public boolean isVehicleAvailable(Long vehicleId, LocalDate startDate, LocalDate endDate) {
         List<Reservation> existingReservations = reservationRepository
                 .findByVehicleIdAndStartDateBetween(vehicleId, startDate, endDate);

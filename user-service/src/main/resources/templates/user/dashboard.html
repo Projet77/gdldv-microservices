@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord - GDLDV</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .btn-logout {
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .welcome-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .welcome-card h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .welcome-card p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .users-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .users-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .users-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .users-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-active {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .status-inactive {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .users-table {
+                font-size: 14px;
+            }
+
+            .users-table th,
+            .users-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <span>🚗</span>
+            <span>GDLDV</span>
+        </div>
+        <div class="navbar-user">
+            <div class="user-info">
+                <div class="user-avatar">👤</div>
+                <div>
+                    <div th:text="${user.firstName + ' ' + user.lastName}">Nom Utilisateur</div>
+                    <small th:text="${user.email}">email@exemple.com</small>
+                </div>
+            </div>
+            <a th:href="@{/logout}" class="btn-logout">Déconnexion</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div th:if="${success}" class="alert alert-success">
+            <span th:text="${success}">Succès</span>
+        </div>
+
+        <div class="welcome-card">
+            <h1>Bienvenue, <span th:text="${user.firstName}">Utilisateur</span>!</h1>
+            <p>Vous êtes connecté au système de gestion de locations de véhicules GDLDV</p>
+            <span class="role-badge" th:text="${user.role}">ROLE</span>
+        </div>
+
+        <!-- Section visible uniquement pour les admins -->
+        <div class="users-section" th:if="${user.role == 'ADMIN'}">
+            <h2>Liste des utilisateurs</h2>
+
+            <div th:if="${users != null and !users.isEmpty()}">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Téléphone</th>
+                            <th>Rôle</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="u : ${users}">
+                            <td th:text="${u.id}">1</td>
+                            <td th:text="${u.firstName + ' ' + u.lastName}">Nom Prénom</td>
+                            <td th:text="${u.email}">email@exemple.com</td>
+                            <td th:text="${u.phoneNumber}">+221 77 123 45 67</td>
+                            <td th:text="${u.role}">CLIENT</td>
+                            <td>
+                                <span th:if="${u.active}" class="status-active">Actif</span>
+                                <span th:unless="${u.active}" class="status-inactive">Inactif</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="no-data" th:if="${users == null or users.isEmpty()}">
+                <p>Aucun utilisateur enregistré</p>
+            </div>
+        </div>
+
+        <!-- Section pour les clients -->
+        <div class="users-section" th:if="${user.role == 'CLIENT'}">
+            <h2>Mes informations</h2>
+            <table class="users-table">
+                <tr>
+                    <th>Email</th>
+                    <td th:text="${user.email}">email@exemple.com</td>
+                </tr>
+                <tr>
+                    <th>Téléphone</th>
+                    <td th:text="${user.phoneNumber ?: 'Non renseigné'}">+221 77 123 45 67</td>
+                </tr>
+                <tr>
+                    <th>Adresse</th>
+                    <td th:text="${user.address ?: 'Non renseignée'}">Adresse</td>
+                </tr>
+                <tr>
+                    <th>Date d'inscription</th>
+                    <td th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy HH:mm')}">Date</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

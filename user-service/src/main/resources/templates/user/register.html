@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription - GDLDV</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .register-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .register-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .register-header h1 {
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+
+        .register-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .register-body {
+            padding: 35px 30px;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-error {
+            background-color: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #333;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 11px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group select {
+            cursor: pointer;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <div class="icon">🚗</div>
+            <h1>Créer un compte</h1>
+            <p>Rejoignez GDLDV</p>
+        </div>
+
+        <div class="register-body">
+            <div th:if="${error}" class="alert alert-error">
+                <span th:text="${error}">Erreur</span>
+            </div>
+
+            <form method="post" th:action="@{/register}" th:object="${user}">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">Prénom *</label>
+                        <input type="text"
+                               id="firstName"
+                               th:field="*{firstName}"
+                               placeholder="Prénom"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">Nom *</label>
+                        <input type="text"
+                               id="lastName"
+                               th:field="*{lastName}"
+                               placeholder="Nom"
+                               required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Adresse email *</label>
+                    <input type="email"
+                           id="email"
+                           th:field="*{email}"
+                           placeholder="votre.email@exemple.com"
+                           required
+                           autocomplete="email">
+                </div>
+
+                <div class="form-group">
+                    <label for="phoneNumber">Téléphone</label>
+                    <input type="tel"
+                           id="phoneNumber"
+                           th:field="*{phoneNumber}"
+                           placeholder="+221 77 123 45 67"
+                           autocomplete="tel">
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Adresse</label>
+                    <input type="text"
+                           id="address"
+                           th:field="*{address}"
+                           placeholder="Adresse complète"
+                           autocomplete="street-address">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">Mot de passe *</label>
+                        <input type="password"
+                               id="password"
+                               th:field="*{password}"
+                               placeholder="••••••••"
+                               required
+                               minlength="6"
+                               autocomplete="new-password">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirmer *</label>
+                        <input type="password"
+                               id="confirmPassword"
+                               name="confirmPassword"
+                               placeholder="••••••••"
+                               required
+                               minlength="6"
+                               autocomplete="new-password">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Type de compte</label>
+                    <select id="role" th:field="*{role}">
+                        <option value="CLIENT">Client</option>
+                        <option value="ADMIN">Administrateur</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn">Créer mon compte</button>
+            </form>
+
+            <div class="login-link">
+                Vous avez déjà un compte?
+                <a th:href="@{/login}">Se connecter</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

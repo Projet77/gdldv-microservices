@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.gdldv</groupId>
-    <artifactId>gdldv-microservices</artifactId>
+    <artifactId>gdldv-project</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
@@ -14,11 +14,11 @@
     <description>Microservices pour gestion de locations de voitures</description>
 
     <modules>
-        <module>eureka-server</module>
-        <module>api-gateway</module>
         <module>vehicle-service</module>
         <module>reservation-service</module>
         <module>user-service</module>
+        <module>api-gateway</module>
+        <module>rental-service</module>
     </modules>
 
     <properties>
