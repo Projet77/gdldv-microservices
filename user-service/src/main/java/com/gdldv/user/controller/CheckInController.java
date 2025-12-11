@@ -1,10 +1,9 @@
 package com.gdldv.user.controller;
 
-import com.gdldv.user.dto.CheckInRequest;
-import com.gdldv.user.dto.CheckInResponse;
-import com.gdldv.user.dto.ChargesResponse;
+import com.gdldv.user.dto.*;
 import com.gdldv.user.entity.CheckIn;
 import com.gdldv.user.service.CheckInService;
+import com.gdldv.user.service.EnhancedCheckInService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class CheckInController {
 
     private final CheckInService checkInService;
+    private final EnhancedCheckInService enhancedCheckInService;
 
     @PostMapping
     @Operation(summary = "Effectuer un check-in")
@@ -79,6 +79,48 @@ public class CheckInController {
             .photoUrls(checkIn.getPhotoUrls())
             .createdAt(checkIn.getCreatedAt())
             .build();
+    }
+
+    /**
+     * GDLDV-585: Check-in avancé avec rapport de dommages (Sprint 3)
+     */
+    @PostMapping("/advanced")
+    @Operation(summary = "Effectuer un check-in avancé avec rapport de dommages")
+    public ResponseEntity<CheckInReportDTO> performAdvancedCheckIn(
+            @Valid @RequestBody AdvancedCheckInRequest request) {
+
+        DamageReport damageReport = DamageReport.builder()
+                .paintDamage(request.getPaintDamage())
+                .bumperDamage(request.getBumperDamage())
+                .windowDamage(request.getWindowDamage())
+                .tireDamage(request.getTireDamage())
+                .seatDamage(request.getSeatDamage())
+                .generalNotes(request.getGeneralNotes())
+                .estimatedRepairCost(request.getEstimatedRepairCost())
+                .build();
+
+        CheckInReportDTO report = enhancedCheckInService.performAdvancedCheckIn(
+                request.getReservationId(),
+                request.getVehicleId(),
+                getCurrentUserId(),
+                request.getMileage(),
+                request.getFuelLevel(),
+                request.getPhotoUrls(),
+                request.getConditionDescription(),
+                damageReport
+        );
+
+        return new ResponseEntity<>(report, HttpStatus.CREATED);
+    }
+
+    /**
+     * GDLDV-585: Récupérer le rapport détaillé d'un check-in
+     */
+    @GetMapping("/{checkInId}/report")
+    @Operation(summary = "Récupérer le rapport détaillé d'un check-in")
+    public ResponseEntity<CheckInReportDTO> getCheckInReport(@PathVariable Long checkInId) {
+        CheckInReportDTO report = enhancedCheckInService.getCheckInReport(checkInId);
+        return ResponseEntity.ok(report);
     }
 
     private Long getCurrentUserId() {

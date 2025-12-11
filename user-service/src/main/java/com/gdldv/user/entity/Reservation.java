@@ -33,6 +33,9 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
+    @Column(name = "stripe_payment_intent_id")
+    private String stripePaymentIntentId;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -54,7 +57,7 @@ public class Reservation {
     public Reservation() {
     }
 
-    public Reservation(Long id, String confirmationNumber, Long userId, Long vehicleId, String vehicleBrand, String vehicleModel, LocalDateTime startDate, LocalDateTime endDate, Double totalPrice, ReservationStatus status, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Reservation(Long id, String confirmationNumber, Long userId, Long vehicleId, String vehicleBrand, String vehicleModel, LocalDateTime startDate, LocalDateTime endDate, Double totalPrice, ReservationStatus status, String stripePaymentIntentId, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.confirmationNumber = confirmationNumber;
         this.userId = userId;
@@ -65,6 +68,7 @@ public class Reservation {
         this.endDate = endDate;
         this.totalPrice = totalPrice;
         this.status = status;
+        this.stripePaymentIntentId = stripePaymentIntentId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -85,6 +89,7 @@ public class Reservation {
         private LocalDateTime endDate;
         private Double totalPrice;
         private ReservationStatus status;
+        private String stripePaymentIntentId;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
 
@@ -138,6 +143,11 @@ public class Reservation {
             return this;
         }
 
+        public Builder stripePaymentIntentId(String stripePaymentIntentId) {
+            this.stripePaymentIntentId = stripePaymentIntentId;
+            return this;
+        }
+
         public Builder createdAt(LocalDateTime createdAt) {
             this.createdAt = createdAt;
             return this;
@@ -149,7 +159,7 @@ public class Reservation {
         }
 
         public Reservation build() {
-            return new Reservation(id, confirmationNumber, userId, vehicleId, vehicleBrand, vehicleModel, startDate, endDate, totalPrice, status, createdAt, updatedAt);
+            return new Reservation(id, confirmationNumber, userId, vehicleId, vehicleBrand, vehicleModel, startDate, endDate, totalPrice, status, stripePaymentIntentId, createdAt, updatedAt);
         }
     }
 
@@ -232,6 +242,14 @@ public class Reservation {
 
     public void setStatus(ReservationStatus status) {
         this.status = status;
+    }
+
+    public String getStripePaymentIntentId() {
+        return stripePaymentIntentId;
+    }
+
+    public void setStripePaymentIntentId(String stripePaymentIntentId) {
+        this.stripePaymentIntentId = stripePaymentIntentId;
     }
 
     public LocalDateTime getCreatedAt() {
