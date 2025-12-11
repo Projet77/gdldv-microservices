@@ -32,6 +32,12 @@ public class UserService {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private com.gdldv.user.repository.RoleRepository roleRepository;
+
     /**
      * GDLDV-458: Consulter son profil
      */
@@ -148,12 +154,61 @@ public class UserService {
     }
 
     /**
+     * Trouver un utilisateur par email
+     */
+    public java.util.Optional<User> findUserByEmail(String email) {
+        logger.debug("Finding user by email: {}", email);
+        return userRepository.findByEmail(email);
+    }
+
+    /**
+     * Trouver un utilisateur par ID
+     */
+    public java.util.Optional<User> findUserById(Long id) {
+        logger.debug("Finding user by ID: {}", id);
+        return userRepository.findById(id);
+    }
+
+    /**
      * Créer un utilisateur (utilisé pour inscription web)
      */
     @Transactional
     public User createUser(User user) {
         logger.info("Création d'un nouvel utilisateur: {}", user.getEmail());
-        // Le mot de passe sera encodé par AuthService
+
+        // Encoder le mot de passe avant de sauvegarder
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+
+        // Ajouter le rôle CLIENT par défaut si aucun rôle n'est défini
+        if (user.getRoles() == null || user.getRoles().isEmpty()) {
+            com.gdldv.user.entity.Role clientRole = roleRepository
+                .findByName(com.gdldv.user.entity.Role.ERole.ROLE_CLIENT)
+                .orElseThrow(() -> new RuntimeException("Erreur: Le rôle CLIENT n'existe pas dans la base de données"));
+            user.getRoles().add(clientRole);
+        }
+
+        // S'assurer que l'utilisateur est actif par défaut
+        if (!user.isActive()) {
+            user.setActive(true);
+        }
+
+        User savedUser = userRepository.save(user);
+        logger.info("Utilisateur créé avec succès: ID={}, Email={}, Rôles={}",
+            savedUser.getId(),
+            savedUser.getEmail(),
+            savedUser.getRoles().stream().map(r -> r.getName().name()).toList());
+
+        return savedUser;
+    }
+
+    /**
+     * Mettre à jour un utilisateur (méthode simple)
+     */
+    @Transactional
+    public User updateUser(User user) {
+        logger.info("Updating user: {}", user.getId());
         return userRepository.save(user);
     }
 

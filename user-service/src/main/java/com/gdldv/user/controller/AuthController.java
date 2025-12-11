@@ -34,34 +34,6 @@ public class AuthController {
     }
 
     /**
-     * Traiter la connexion
-     */
-    @PostMapping("/login")
-    public String processLogin(@RequestParam String email,
-                               @RequestParam String password,
-                               HttpSession session,
-                               RedirectAttributes redirectAttributes) {
-        log.info("Login attempt for email: {}", email);
-
-        Optional<User> userOptional = userService.authenticateUser(email, password);
-
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            session.setAttribute("currentUser", user);
-            session.setAttribute("userId", user.getId());
-            session.setAttribute("userRole", user.getRole());
-
-            log.info("User logged in successfully: {} ({})", user.getEmail(), user.getRole());
-            redirectAttributes.addFlashAttribute("success", "Connexion réussie!");
-            return "redirect:/dashboard";
-        } else {
-            log.warn("Failed login attempt for email: {}", email);
-            redirectAttributes.addFlashAttribute("error", "Email ou mot de passe incorrect");
-            return "redirect:/login?error";
-        }
-    }
-
-    /**
      * Page d'inscription
      */
     @GetMapping("/register")
@@ -120,15 +92,8 @@ public class AuthController {
      * Page d'accueil (dashboard)
      */
     @GetMapping("/dashboard")
-    public String showDashboard(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
-        User currentUser = (User) session.getAttribute("currentUser");
-
-        if (currentUser == null) {
-            log.warn("Unauthorized access to dashboard - no user in session");
-            redirectAttributes.addFlashAttribute("error", "Veuillez vous connecter");
-            return "redirect:/login";
-        }
-
+    public String showDashboard(Model model,
+                               @org.springframework.security.core.annotation.AuthenticationPrincipal User currentUser) {
         log.info("User accessing dashboard: {}", currentUser.getEmail());
         model.addAttribute("user", currentUser);
 

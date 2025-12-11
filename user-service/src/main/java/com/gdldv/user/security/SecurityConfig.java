@@ -64,6 +64,9 @@ public class SecurityConfig {
                         // Actuator (health checks)
                         .requestMatchers("/actuator/**").permitAll()
 
+                        // API check-out/check-in endpoints
+                        .requestMatchers("/api/check-out/**", "/api/check-in/**", "/api/inspections/**").permitAll()
+
                         // Pages web protégées (nécessitent authentification)
                         .requestMatchers("/dashboard", "/logout", "/profile", "/profile/**", "/rental-history").authenticated()
 
@@ -75,6 +78,22 @@ public class SecurityConfig {
 
                         // Tous les autres endpoints nécessitent authentification
                         .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .usernameParameter("email")  // Utiliser 'email' au lieu de 'username'
+                        .passwordParameter("password")
+                        .defaultSuccessUrl("/dashboard", true)
+                        .failureUrl("/login?error")
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll()
                 )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
