@@ -45,4 +45,9 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
      */
     @Query("SELECT r FROM Rental r WHERE r.endDate < :now AND r.status IN ('CHECKED_OUT', 'ACTIVE')")
     List<Rental> findOverdueRentals(@Param("now") LocalDateTime now);
+
+    /**
+     * GDLDV-533: Trouver les locations créées entre deux dates (pour KPI Dashboard)
+     */
+    List<Rental> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
 }

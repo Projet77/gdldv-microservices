@@ -41,8 +41,12 @@ public class Reservation {
     @Column(nullable = false)
     private Double totalPrice;
 
-    @Column(columnDefinition = "VARCHAR(255) DEFAULT 'PENDING'")
-    private String status; // PENDING, CONFIRMED, CANCELLED, COMPLETED
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReservationStatus status = ReservationStatus.PENDING;
+
+    @Column(unique = true)
+    private String stripePaymentIntentId;
 
     @Column(length = 500)
     private String notes;

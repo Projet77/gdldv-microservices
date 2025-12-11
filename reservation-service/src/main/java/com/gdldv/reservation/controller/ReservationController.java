@@ -1,11 +1,13 @@
 package com.gdldv.reservation.controller;
 
 import com.gdldv.reservation.entity.Reservation;
+import com.gdldv.reservation.entity.ReservationStatus;
 import com.gdldv.reservation.service.ReservationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +15,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/reservations")
 @RequiredArgsConstructor
+@Slf4j
 @Tag(name = "Reservation", description = "API de gestion des réservations")
 public class ReservationController {
 
@@ -50,7 +54,7 @@ public class ReservationController {
 
     @GetMapping("/status/{status}")
     @Operation(summary = "Récupérer les réservations par statut")
-    public ResponseEntity<List<Reservation>> getReservationsByStatus(@PathVariable String status) {
+    public ResponseEntity<List<Reservation>> getReservationsByStatus(@PathVariable ReservationStatus status) {
         return ResponseEntity.ok(reservationService.getReservationsByStatus(status));
     }
 
@@ -83,10 +87,20 @@ public class ReservationController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Supprimer une réservation")
-    public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {
-        reservationService.deleteReservation(id);
-        return ResponseEntity.noContent().build();
+    @Operation(summary = "Annuler une réservation avec remboursement")
+    public ResponseEntity<?> cancelReservation(@PathVariable Long id) {
+        try {
+            log.info("Cancelling reservation: {}", id);
+            reservationService.cancelReservation(id);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Reservation cancelled successfully",
+                    "reservationId", id
+            ));
+        } catch (RuntimeException e) {
+            log.error("Error cancelling reservation {}: {}", id, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PutMapping("/{id}/confirm")
