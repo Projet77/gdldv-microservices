@@ -1,12 +1,11 @@
 package com.gdldv.reservation.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class VehicleDTO {
     private Long id;
     private String brand;
@@ -16,4 +15,5 @@ public class VehicleDTO {
     private Double dailyPrice;
     private String category;
     private String status;
+    private Boolean isActive;
 }

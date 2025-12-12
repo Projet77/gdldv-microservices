@@ -1,24 +1,26 @@
 package com.gdldv.reservation.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
+import jakarta.validation.constraints.*;
+import lombok.*;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "reservations")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Reservation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotBlank
+    @Column(unique = true)
+    private String confirmationNumber;  // CONF-XXXXX
 
     @NotNull(message = "L'ID du véhicule est obligatoire")
     @Column(nullable = false)
@@ -29,15 +31,14 @@ public class Reservation {
     private Long userId;
 
     @NotNull(message = "La date de début est obligatoire")
-    @Future(message = "La date de début doit être dans le futur")
     @Column(nullable = false)
-    private LocalDate startDate;
+    private LocalDateTime startDate;
 
     @NotNull(message = "La date de fin est obligatoire")
-    @Future(message = "La date de fin doit être dans le futur")
     @Column(nullable = false)
-    private LocalDate endDate;
+    private LocalDateTime endDate;
 
+    @Positive
     @Column(nullable = false)
     private Double totalPrice;
 
@@ -45,9 +46,34 @@ public class Reservation {
     @Column(nullable = false)
     private ReservationStatus status = ReservationStatus.PENDING;
 
+    // Options additionnelles
+    @ElementCollection
+    private List<ReservationOption> options;
+
+    // Stripe payment
     @Column(unique = true)
     private String stripePaymentIntentId;
 
     @Column(length = 500)
     private String notes;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+        if (status == null) {
+            status = ReservationStatus.PENDING;
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

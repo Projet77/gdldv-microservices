@@ -1,5 +1,7 @@
 package com.gdldv.reservation.controller;
 
+import com.gdldv.reservation.dto.CreateReservationRequest;
+import com.gdldv.reservation.dto.ReservationResponse;
 import com.gdldv.reservation.entity.Reservation;
 import com.gdldv.reservation.entity.ReservationStatus;
 import com.gdldv.reservation.service.ReservationService;
@@ -13,14 +15,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/reservations")
+@RequestMapping("/api/reservations")
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin(origins = "*")
 @Tag(name = "Reservation", description = "API de gestion des réservations")
 public class ReservationController {
 
@@ -58,62 +61,93 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.getReservationsByStatus(status));
     }
 
+    @GetMapping("/confirmation/{confirmationNumber}")
+    @Operation(summary = "Récupérer une réservation par numéro de confirmation")
+    public ResponseEntity<Reservation> getReservationByConfirmationNumber(@PathVariable String confirmationNumber) {
+        return reservationService.getReservationByConfirmationNumber(confirmationNumber)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/check-availability")
     @Operation(summary = "Vérifier la disponibilité d'un véhicule")
     public ResponseEntity<Boolean> checkAvailability(
             @RequestParam Long vehicleId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
         boolean available = reservationService.isVehicleAvailable(vehicleId, startDate, endDate);
         return ResponseEntity.ok(available);
     }
 
     @PostMapping
     @Operation(summary = "Créer une nouvelle réservation")
-    public ResponseEntity<Reservation> createReservation(@Valid @RequestBody Reservation reservation) {
-        Reservation createdReservation = reservationService.createReservation(reservation);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdReservation);
+    public ResponseEntity<ReservationResponse> createReservation(@Valid @RequestBody CreateReservationRequest request) {
+        log.info("Received reservation request: {}", request);
+        try {
+            ReservationResponse createdReservation = reservationService.createReservation(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdReservation);
+        } catch (RuntimeException e) {
+            log.error("Error creating reservation: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Mettre à jour une réservation")
-    public ResponseEntity<Reservation> updateReservation(@PathVariable Long id, @Valid @RequestBody Reservation reservation) {
+    public ResponseEntity<ReservationResponse> updateReservation(@PathVariable Long id, @Valid @RequestBody Reservation reservation) {
         try {
-            Reservation updatedReservation = reservationService.updateReservation(id, reservation);
+            ReservationResponse updatedReservation = reservationService.updateReservation(id, reservation);
             return ResponseEntity.ok(updatedReservation);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Annuler une réservation avec remboursement")
-    public ResponseEntity<?> cancelReservation(@PathVariable Long id) {
+    @PatchMapping("/{id}/confirm")
+    @Operation(summary = "Confirmer une réservation")
+    public ResponseEntity<Void> confirmReservation(@PathVariable Long id) {
         try {
-            log.info("Cancelling reservation: {}", id);
-            reservationService.cancelReservation(id);
-            return ResponseEntity.ok(Map.of(
-                    "message", "Reservation cancelled successfully",
-                    "reservationId", id
-            ));
+            reservationService.confirmReservation(id);
+            return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
-            log.error("Error cancelling reservation {}: {}", id, e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
+            log.error("Error confirming reservation {}: {}", id, e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 
-    @PutMapping("/{id}/confirm")
-    @Operation(summary = "Confirmer une réservation")
-    public ResponseEntity<Void> confirmReservation(@PathVariable Long id) {
-        reservationService.confirmReservation(id);
-        return ResponseEntity.ok().build();
+    @PatchMapping("/{id}/complete")
+    @Operation(summary = "Compléter une réservation")
+    public ResponseEntity<Void> completeReservation(@PathVariable Long id) {
+        try {
+            reservationService.completeReservation(id);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            log.error("Error completing reservation {}: {}", id, e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @PutMapping("/{id}/complete")
-    @Operation(summary = "Clôturer une réservation")
-    public ResponseEntity<Void> completeReservation(@PathVariable Long id) {
-        reservationService.completeReservation(id);
-        return ResponseEntity.ok().build();
+    @PatchMapping("/{id}/cancel")
+    @Operation(summary = "Annuler une réservation")
+    public ResponseEntity<Void> cancelReservation(@PathVariable Long id) {
+        try {
+            reservationService.cancelReservation(id);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            log.error("Error cancelling reservation {}: {}", id, e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Supprimer une réservation")
+    public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {
+        try {
+            reservationService.deleteReservation(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            log.error("Error deleting reservation {}: {}", id, e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
     }
 }
