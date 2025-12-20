@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="GDLDV - Location de véhicules au Sénégal. Trouvez la voiture parfaite pour vos besoins. Réservation en ligne facile, prix compétitifs, service client 24/7.">
+    <meta name="keywords" content="location voiture, Dakar, Sénégal, véhicule, réservation, GDLDV">
+    <title>GDLDV - Location de Véhicules au Sénégal | Votre Partenaire Mobilité</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #111111 0%, #2f2f2f 100%);
+            color: #f6f6f6;
+            overflow-x: hidden;
+        }
+
+        /* NAVIGATION */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(47, 47, 47, 0.5);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 203, 116, 0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(47, 47, 47, 0.9);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffcb74;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            text-shadow: 0 2px 10px rgba(255, 203, 116, 0.3);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 35px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #f6f6f6;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #ffcb74;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #ffcb74;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .btn-primary {
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #ffcb74 0%, #ffa94d 100%);
+            color: #111111;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(255, 203, 116, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 203, 116, 0.4);
+        }
+
+        .btn-secondary {
+            padding: 12px 28px;
+            background: transparent;
+            color: #f6f6f6;
+            border: 1px solid rgba(255, 203, 116, 0.3);
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 203, 116, 0.1);
+            border-color: #ffcb74;
+            color: #ffcb74;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 20px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(255, 203, 116, 0.15) 0%, transparent 70%);
+            top: -400px;
+            right: -400px;
+            border-radius: 50%;
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.15; }
+            50% { transform: scale(1.1); opacity: 0.2; }
+        }
+
+        .hero-content {
+            max-width: 900px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 64px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 25px;
+            color: #f6f6f6;
+        }
+
+        .hero h1 span {
+            color: #ffcb74;
+            background: linear-gradient(135deg, #ffcb74 0%, #ffa94d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: rgba(246, 246, 246, 0.8);
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            background: rgba(47, 47, 47, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 203, 116, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 50px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .search-input {
+            padding: 15px;
+            background: rgba(47, 47, 47, 0.6);
+            border: 1px solid rgba(255, 203, 116, 0.2);
+            border-radius: 10px;
+            color: #f6f6f6;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #ffcb74;
+            background: rgba(47, 47, 47, 0.8);
+        }
+
+        /* STATS SECTION */
+        .stats {
+            padding: 80px 20px;
+            background: rgba(47, 47, 47, 0.3);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .stat-card {
+            background: rgba(47, 47, 47, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid rgba(255, 203, 116, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 203, 116, 0.4);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .stat-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .stat-number {
+            font-size: 42px;
+            font-weight: 700;
+            color: #ffcb74;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: rgba(246, 246, 246, 0.7);
+            font-size: 16px;
+        }
+
+        /* PROCESS SECTION */
+        .process {
+            padding: 100px 20px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: 42px;
+            font-weight: 700;
+            color: #ffcb74;
+            margin-bottom: 15px;
+        }
+
+        .section-header p {
+            font-size: 18px;
+            color: rgba(246, 246, 246, 0.7);
+        }
+
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .step-card {
+            background: rgba(47, 47, 47, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 203, 116, 0.2);
+            border-radius: 20px;
+            padding: 35px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 203, 116, 0.4);
+        }
+
+        .step-number {
+            position: absolute;
+            top: -20px;
+            left: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ffcb74 0%, #ffa94d 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #111111;
+            box-shadow: 0 4px 15px rgba(255, 203, 116, 0.3);
+        }
+
+        .step-icon {
+            font-size: 60px;
+            margin: 20px 0;
+            display: block;
+        }
+
+        .step-card h3 {
+            color: #ffcb74;
+            font-size: 22px;
+            margin-bottom: 12px;
+        }
+
+        .step-card p {
+            color: rgba(246, 246, 246, 0.8);
+            line-height: 1.6;
+        }
+
+        /* CATEGORIES SECTION */
+        .categories {
+            padding: 100px 20px;
+            background: rgba(47, 47, 47, 0.3);
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .category-card {
+            background: rgba(47, 47, 47, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 203, 116, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .category-card:hover {
+            transform: translateY(-10px);
+            border-color: #ffcb74;
+            background: rgba(255, 203, 116, 0.1);
+        }
+
+        .category-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 8px rgba(255, 203, 116, 0.3));
+        }
+
+        .category-card h3 {
+            color: #ffcb74;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .category-card p {
+            color: rgba(246, 246, 246, 0.7);
+            margin-bottom: 15px;
+        }
+
+        .category-price {
+            color: #f6f6f6;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        /* TESTIMONIALS */
+        .testimonials {
+            padding: 100px 20px;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .testimonial-card {
+            background: rgba(47, 47, 47, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 203, 116, 0.2);
+            border-radius: 20px;
+            padding: 35px;
+            transition: all 0.3s ease;
+        }
+
+        .testimonial-card:hover {
+            border-color: rgba(255, 203, 116, 0.4);
+            transform: translateY(-5px);
+        }
+
+        .testimonial-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ffcb74 0%, #ffa94d 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #111111;
+        }
+
+        .testimonial-info h4 {
+            color: #ffcb74;
+            margin-bottom: 5px;
+        }
+
+        .rating {
+            color: #ffc107;
+        }
+
+        .testimonial-text {
+            color: rgba(246, 246, 246, 0.8);
+            line-height: 1.7;
+            font-style: italic;
+        }
+
+        /* ADVANTAGES */
+        .advantages {
+            padding: 100px 20px;
+            background: rgba(47, 47, 47, 0.3);
+        }
+
+        .advantages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .advantage-card {
+            background: rgba(47, 47, 47, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 203, 116, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .advantage-card:hover {
+            border-color: #ffcb74;
+            transform: translateY(-5px);
+        }
+
+        .advantage-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 203, 116, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .advantage-card h3 {
+            color: #ffcb74;
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .advantage-card p {
+            color: rgba(246, 246, 246, 0.8);
+            line-height: 1.6;
+        }
+
+        /* FAQ */
+        .faq {
+            padding: 100px 20px;
+        }
+
+        .faq-list {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: rgba(47, 47, 47, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 203, 116, 0.2);
+            border-radius: 16px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .faq-question {
+            padding: 25px 30px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #ffcb74;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .faq-question:hover {
+            background: rgba(255, 203, 116, 0.05);
+        }
+
+        .faq-answer {
+            padding: 0 30px 25px;
+            color: rgba(246, 246, 246, 0.8);
+            line-height: 1.7;
+            display: none;
+        }
+
+        .faq-item.active .faq-answer {
+            display: block;
+        }
+
+        .faq-toggle {
+            font-size: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-toggle {
+            transform: rotate(45deg);
+        }
+
+        /* CTA */
+        .cta {
+            padding: 100px 20px;
+            text-align: center;
+            background: rgba(47, 47, 47, 0.3);
+        }
+
+        .cta-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cta h2 {
+            font-size: 48px;
+            color: #ffcb74;
+            margin-bottom: 20px;
+        }
+
+        .cta p {
+            font-size: 20px;
+            color: rgba(246, 246, 246, 0.8);
+            margin-bottom: 40px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* FOOTER */
+        .footer {
+            background: rgba(17, 17, 17, 0.8);
+            padding: 60px 20px 30px;
+            border-top: 1px solid rgba(255, 203, 116, 0.2);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            color: #ffcb74;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(246, 246, 246, 0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #ffcb74;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-link {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 203, 116, 0.2);
+            border: 1px solid rgba(255, 203, 116, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffcb74;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .social-link:hover {
+            background: rgba(255, 203, 116, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 203, 116, 0.1);
+            color: rgba(246, 246, 246, 0.6);
+        }
+
+        /* MOBILE MENU */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #ffcb74;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 42px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+
+            .search-box {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header h2 {
+                font-size: 32px;
+            }
+
+            .cta h2 {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVIGATION -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <span>🚗</span>
+                <span>GDLDV</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#accueil">Accueil</a></li>
+                <li><a href="#processus">Comment ça marche</a></li>
+                <li><a href="#categories">Catégories</a></li>
+                <li><a href="#avis">Avis</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="/login" class="btn-secondary">Connexion</a></li>
+                <li><a href="/register" class="btn-primary">S'inscrire</a></li>
+            </ul>
+            <button class="mobile-menu-btn">☰</button>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero" id="accueil">
+        <div class="hero-content">
+            <h1>Louez Votre Véhicule <span>En Toute Simplicité</span></h1>
+            <p>Découvrez notre flotte moderne de véhicules disponibles partout au Sénégal. Réservation en ligne en quelques clics, prix transparents et service client exceptionnel.</p>
+            <div class="hero-buttons">
+                <a href="#categories" class="btn-primary">Explorer les Véhicules</a>
+                <a href="#processus" class="btn-secondary">Comment ça marche</a>
+            </div>
+
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Ville de départ">
+                <input type="date" class="search-input" placeholder="Date début">
+                <input type="date" class="search-input" placeholder="Date fin">
+                <button class="btn-primary" style="width: 100%;">🔍 Rechercher</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS SECTION -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🚗</div>
+                    <div class="stat-number">48+</div>
+                    <div class="stat-label">Véhicules Disponibles</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-number">342</div>
+                    <div class="stat-label">Clients Satisfaits</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📍</div>
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Villes Desservies</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-number">4.8/5</div>
+                    <div class="stat-label">Note Moyenne</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROCESS SECTION -->
+    <section class="process" id="processus">
+        <div class="container">
+            <div class="section-header">
+                <h2>Comment Ça Marche</h2>
+                <p>Louez un véhicule en 3 étapes simples</p>
+            </div>
+            <div class="process-steps">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <span class="step-icon">🔍</span>
+                    <h3>Recherchez</h3>
+                    <p>Choisissez votre destination, vos dates et parcourez notre sélection de véhicules disponibles.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <span class="step-icon">📋</span>
+                    <h3>Réservez</h3>
+                    <p>Sélectionnez le véhicule parfait, remplissez vos informations et confirmez votre réservation en ligne.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <span class="step-icon">🚗</span>
+                    <h3>Conduisez</h3>
+                    <p>Récupérez votre véhicule à l'agence, profitez de votre voyage et retournez-le à la fin.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CATEGORIES -->
+    <section class="categories" id="categories">
+        <div class="container">
+            <div class="section-header">
+                <h2>Nos Catégories de Véhicules</h2>
+                <p>Trouvez le véhicule parfait pour vos besoins</p>
+            </div>
+            <div class="categories-grid">
+                <div class="category-card">
+                    <div class="category-icon">🚗</div>
+                    <h3>Citadines</h3>
+                    <p>Parfaites pour la ville, économiques et faciles à garer</p>
+                    <div class="category-price">À partir de 15,000 FCFA/jour</div>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">🚙</div>
+                    <h3>SUV</h3>
+                    <p>Confort et espace pour toute la famille</p>
+                    <div class="category-price">À partir de 25,000 FCFA/jour</div>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">🚐</div>
+                    <h3>Minibus</h3>
+                    <p>Idéal pour les groupes, jusqu'à 9 places</p>
+                    <div class="category-price">À partir de 35,000 FCFA/jour</div>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">🏎️</div>
+                    <h3>Luxe</h3>
+                    <p>Voyagez avec style et prestance</p>
+                    <div class="category-price">À partir de 45,000 FCFA/jour</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="testimonials" id="avis">
+        <div class="container">
+            <div class="section-header">
+                <h2>Ce Que Disent Nos Clients</h2>
+                <p>Des milliers de clients satisfaits nous font confiance</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-header">
+                        <div class="avatar">AD</div>
+                        <div class="testimonial-info">
+                            <h4>Amadou Diallo</h4>
+                            <div class="rating">⭐⭐⭐⭐⭐</div>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">"Service impeccable ! La réservation était simple et rapide. Le véhicule était propre et en parfait état. Je recommande vivement GDLDV pour tous vos besoins de location."</p>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-header">
+                        <div class="avatar">FS</div>
+                        <div class="testimonial-info">
+                            <h4>Fatou Sall</h4>
+                            <div class="rating">⭐⭐⭐⭐⭐</div>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">"Prix très compétitifs et excellent service client. L'équipe est professionnelle et toujours disponible. C'est ma plateforme préférée pour la location de véhicules au Sénégal."</p>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-header">
+                        <div class="avatar">ON</div>
+                        <div class="testimonial-info">
+                            <h4>Ousmane Ndiaye</h4>
+                            <div class="rating">⭐⭐⭐⭐⭐</div>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">"J'ai loué un SUV pour mes vacances en famille. Le processus était fluide et le véhicule dépassait nos attentes. Merci GDLDV pour cette expérience formidable!"</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ADVANTAGES -->
+    <section class="advantages">
+        <div class="container">
+            <div class="section-header">
+                <h2>Pourquoi Choisir GDLDV</h2>
+                <p>Votre satisfaction est notre priorité</p>
+            </div>
+            <div class="advantages-grid">
+                <div class="advantage-card">
+                    <div class="advantage-icon">✅</div>
+                    <h3>Réservation Facile</h3>
+                    <p>Réservez en quelques clics depuis votre ordinateur ou smartphone, 24h/24 et 7j/7.</p>
+                </div>
+                <div class="advantage-card">
+                    <div class="advantage-icon">💰</div>
+                    <h3>Prix Transparents</h3>
+                    <p>Aucun frais caché. Le prix affiché est le prix final que vous payez.</p>
+                </div>
+                <div class="advantage-card">
+                    <div class="advantage-icon">🚗</div>
+                    <h3>Flotte Moderne</h3>
+                    <p>Véhicules récents, bien entretenus et régulièrement révisés pour votre sécurité.</p>
+                </div>
+                <div class="advantage-card">
+                    <div class="advantage-icon">🛡️</div>
+                    <h3>Assurance Complète</h3>
+                    <p>Tous nos véhicules sont assurés pour votre tranquillité d'esprit.</p>
+                </div>
+                <div class="advantage-card">
+                    <div class="advantage-icon">📞</div>
+                    <h3>Support 24/7</h3>
+                    <p>Notre équipe est disponible jour et nuit pour répondre à vos questions.</p>
+                </div>
+                <div class="advantage-card">
+                    <div class="advantage-icon">⭐</div>
+                    <h3>Programme Fidélité</h3>
+                    <p>Gagnez des points à chaque location et bénéficiez de réductions exclusives.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq" id="faq">
+        <div class="container">
+            <div class="section-header">
+                <h2>Questions Fréquentes</h2>
+                <p>Trouvez les réponses à vos questions</p>
+            </div>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Quels documents sont nécessaires pour louer un véhicule ?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        Vous aurez besoin d'une pièce d'identité valide, d'un permis de conduire en cours de validité et d'une carte bancaire pour le paiement et la caution.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Puis-je annuler ou modifier ma réservation ?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        Oui, vous pouvez annuler ou modifier votre réservation jusqu'à 24 heures avant la date de prise en charge sans frais. Au-delà, des frais peuvent s'appliquer.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Le carburant est-il inclus dans le prix ?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        Le véhicule vous est remis avec le plein de carburant. Vous devrez le retourner avec le même niveau de carburant, sinon des frais supplémentaires seront appliqués.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Y a-t-il une limite de kilométrage ?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        La plupart de nos locations incluent un kilométrage illimité. Vérifiez les détails lors de la réservation ou contactez notre service client.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Que se passe-t-il en cas de panne ou d'accident ?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        Contactez immédiatement notre assistance 24/7. Nous organiserons le dépannage ou le remplacement du véhicule. Tous nos véhicules sont assurés.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Prêt à Partir à l'Aventure ?</h2>
+                <p>Rejoignez des milliers de clients satisfaits et louez votre véhicule dès aujourd'hui. Profitez d'offres exceptionnelles et d'un service de qualité.</p>
+                <div class="cta-buttons">
+                    <a href="/register" class="btn-primary">Créer un Compte</a>
+                    <a href="#categories" class="btn-secondary">Voir les Véhicules</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>🚗 GDLDV</h3>
+                    <p style="color: rgba(246, 246, 246, 0.7); line-height: 1.6;">
+                        Votre partenaire de confiance pour la location de véhicules au Sénégal. Service professionnel et prix compétitifs.
+                    </p>
+                </div>
+                <div class="footer-section">
+                    <h3>Liens Rapides</h3>
+                    <ul class="footer-links">
+                        <li><a href="#accueil">Accueil</a></li>
+                        <li><a href="#categories">Véhicules</a></li>
+                        <li><a href="#processus">Comment ça marche</a></li>
+                        <li><a href="#avis">Avis Clients</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Légal</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Conditions d'utilisation</a></li>
+                        <li><a href="#">Politique de confidentialité</a></li>
+                        <li><a href="#">Mentions légales</a></li>
+                        <li><a href="#">CGV</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <ul class="footer-links">
+                        <li>📧 contact@gdldv.sn</li>
+                        <li>📞 +221 33 XXX XX XX</li>
+                        <li>📍 Dakar, Sénégal</li>
+                    </ul>
+                    <div class="social-links" style="margin-top: 20px;">
+                        <a href="#" class="social-link">f</a>
+                        <a href="#" class="social-link">𝕏</a>
+                        <a href="#" class="social-link">in</a>
+                        <a href="#" class="social-link">📷</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 GDLDV - Gestion de Location de Véhicules. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // FAQ Toggle
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const faqItem = question.parentElement;
+                faqItem.classList.toggle('active');
+            });
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

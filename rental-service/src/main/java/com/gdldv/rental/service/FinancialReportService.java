@@ -110,7 +110,7 @@ public class FinancialReportService {
     private FinancialReport.FinancialSummary calculateFinancialSummary(List<Rental> rentals) {
         double totalRevenue = rentals.stream()
                 .filter(r -> r.getStatus() == RentalStatus.COMPLETED)
-                .mapToDouble(r -> r.getTotalAmount() != null ? r.getTotalAmount() : 0.0)
+                .mapToDouble(r -> r.getTotalPrice() != null ? r.getTotalPrice().doubleValue() : 0.0)
                 .sum();
 
         double totalExpenses = 0.0; // TODO: Ajouter les dépenses si disponibles
@@ -123,7 +123,7 @@ public class FinancialReportService {
         // Calculer le revenu projeté (réservations actives)
         double projectedRevenue = rentals.stream()
                 .filter(r -> r.getStatus() == RentalStatus.ACTIVE || r.getStatus() == RentalStatus.CHECKED_OUT)
-                .mapToDouble(r -> r.getTotalAmount() != null ? r.getTotalAmount() : 0.0)
+                .mapToDouble(r -> r.getTotalPrice() != null ? r.getTotalPrice().doubleValue() : 0.0)
                 .sum();
 
         return FinancialReport.FinancialSummary.builder()
@@ -147,7 +147,7 @@ public class FinancialReportService {
                         .date(rental.getCreatedAt())
                         .type("RENTAL")
                         .description("Location #" + rental.getId())
-                        .amount(rental.getTotalAmount())
+                        .amount(rental.getTotalPrice() != null ? rental.getTotalPrice().doubleValue() : 0.0)
                         .status(rental.getStatus().toString())
                         .customerName("User-" + rental.getUserId())
                         .vehicleInfo("Vehicle-" + rental.getVehicleId())
@@ -161,7 +161,7 @@ public class FinancialReportService {
     private FinancialReport.CategoryBreakdown calculateCategoryBreakdown(List<Rental> rentals) {
         double totalRevenue = rentals.stream()
                 .filter(r -> r.getStatus() == RentalStatus.COMPLETED)
-                .mapToDouble(r -> r.getTotalAmount() != null ? r.getTotalAmount() : 0.0)
+                .mapToDouble(r -> r.getTotalPrice() != null ? r.getTotalPrice().doubleValue() : 0.0)
                 .sum();
 
         // Pour l'instant, tout le revenu vient des locations

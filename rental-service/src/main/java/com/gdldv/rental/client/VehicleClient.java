@@ -1,6 +1,6 @@
 package com.gdldv.rental.client;
 
-import com.gdldv.rental.dto.VehicleDTO;
+import com.gdldv.reservation.dto.VehicleDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

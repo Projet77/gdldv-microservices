@@ -145,7 +145,7 @@ public class ContractService {
         
         content.append("<h2>Informations Véhicule</h2>");
         content.append("<p><strong>Véhicule:</strong> ").append(vehicleData.getBrand()).append(" ").append(vehicleData.getModel()).append("</p>");
-        content.append("<p><strong>Immatriculation:</strong> ").append(vehicleData.getVin()).append("</p>");
+        content.append("<p><strong>Immatriculation:</strong> ").append(vehicleData.getLicensePlate()).append("</p>");
 
         content.append("<h2>Détails de la Location</h2>");
         content.append("<p><strong>Date de début:</strong> ").append(rental.getStartDate().format(formatter)).append("</p>");
@@ -203,7 +203,7 @@ public class ContractService {
         if (vehicleData != null) {
             dto.setVehicleBrand(vehicleData.getBrand());
             dto.setVehicleModel(vehicleData.getModel());
-            dto.setVehiclePlate(vehicleData.getVin());
+            dto.setVehiclePlate(vehicleData.getLicensePlate());
         }
 
         dto.setStartDate(contract.getRental().getStartDate());

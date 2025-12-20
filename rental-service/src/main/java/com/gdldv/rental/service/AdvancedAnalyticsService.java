@@ -73,7 +73,7 @@ public class AdvancedAnalyticsService {
                 .filter(r -> r.getCreatedAt() != null)
                 .collect(Collectors.groupingBy(
                         r -> YearMonth.from(r.getCreatedAt()),
-                        Collectors.summingDouble(r -> r.getTotalAmount() != null ? r.getTotalAmount() : 0.0)
+                        Collectors.summingDouble(r -> r.getTotalPrice() != null ? r.getTotalPrice().doubleValue() : 0.0)
                 ));
 
         // Calculer les prédictions avec moyenne mobile pondérée
@@ -122,7 +122,7 @@ public class AdvancedAnalyticsService {
                 .filter(r -> r.getCreatedAt() != null)
                 .collect(Collectors.groupingBy(
                         r -> YearMonth.from(r.getCreatedAt()),
-                        Collectors.summingDouble(r -> r.getTotalAmount() != null ? r.getTotalAmount() : 0.0)
+                        Collectors.summingDouble(r -> r.getTotalPrice() != null ? r.getTotalPrice().doubleValue() : 0.0)
                 ));
 
         List<Map.Entry<YearMonth, Double>> sortedMonths = monthlyRevenue.entrySet().stream()
@@ -324,7 +324,7 @@ public class AdvancedAnalyticsService {
 
                     double revenue = rentals.stream()
                             .filter(r -> r.getStatus() == RentalStatus.COMPLETED)
-                            .mapToDouble(r -> r.getTotalAmount() != null ? r.getTotalAmount() : 0.0)
+                            .mapToDouble(r -> r.getTotalPrice() != null ? r.getTotalPrice().doubleValue() : 0.0)
                             .sum();
 
                     // Calculer le taux d'utilisation (simplifié)
@@ -391,7 +391,7 @@ public class AdvancedAnalyticsService {
 
             double revenue = rentals.stream()
                     .filter(r -> r.getStatus() == RentalStatus.COMPLETED)
-                    .mapToDouble(r -> r.getTotalAmount() != null ? r.getTotalAmount() : 0.0)
+                    .mapToDouble(r -> r.getTotalPrice() != null ? r.getTotalPrice().doubleValue() : 0.0)
                     .sum();
 
             if (bookingCount > 5) {

@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .securityContext(context -> context.securityContextRepository(securityContextRepository()))
                 .authorizeHttpRequests(auth -> auth
                         // Pages publiques
-                        .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/", "/home", "/index", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
 
                         // Endpoints API publics (authentification JWT)
                         .requestMatchers("/api/auth/**").permitAll()

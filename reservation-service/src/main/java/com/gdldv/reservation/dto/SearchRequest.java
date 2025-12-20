@@ -20,6 +20,10 @@ public class SearchRequest {
     private String category;      // SUV, Sedan, Compact, etc.
     private Double minPrice;
     private Double maxPrice;
+
+    @Builder.Default
     private Integer page = 0;
+
+    @Builder.Default
     private Integer size = 10;
 }

@@ -120,7 +120,7 @@ public class NotificationService {
                         "vehicleId", rental.getVehicleId(),
                         "startDate", rental.getStartDate().format(DATE_FORMATTER),
                         "endDate", rental.getEndDate().format(DATE_FORMATTER),
-                        "totalAmount", rental.getTotalAmount() != null ? rental.getTotalAmount() : 0.0
+                        "totalAmount", rental.getTotalPrice() != null ? rental.getTotalPrice() : 0.0
                 ))
                 .priority("NORMAL")
                 .sendImmediately(true)

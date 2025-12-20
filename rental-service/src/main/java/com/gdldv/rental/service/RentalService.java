@@ -4,9 +4,12 @@ import com.gdldv.rental.client.ReservationClient;
 import com.gdldv.rental.client.UserClient;
 import com.gdldv.rental.client.VehicleClient;
 import com.gdldv.rental.dto.*;
+import com.gdldv.rental.entity.InspectionType;
 import com.gdldv.rental.entity.Rental;
+import com.gdldv.rental.entity.RentalStatus;
 import com.gdldv.rental.entity.VehicleInspection;
 import com.gdldv.rental.repository.RentalRepository;
+import com.gdldv.reservation.dto.VehicleDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +87,7 @@ public class RentalService {
         rental.setBasePrice(reservation.getTotalPrice());
         rental.setDeposit(request.getDeposit());
         rental.setTotalPrice(reservation.getTotalPrice());
-        rental.setStatus(Rental.RentalStatus.CHECKED_OUT);
+        rental.setStatus(RentalStatus.CHECKED_OUT);
         rental.setStartKilometers(request.getStartKilometers());
         rental.setStartFuelLevel(request.getStartFuelLevel());
         rental.setCheckoutNotes(request.getCheckoutNotes());
@@ -121,8 +124,8 @@ public class RentalService {
         Rental rental = rentalRepository.findById(request.getRentalId())
                 .orElseThrow(() -> new RuntimeException("Location non trouvée"));
 
-        if (!rental.getStatus().equals(Rental.RentalStatus.CHECKED_OUT) &&
-                !rental.getStatus().equals(Rental.RentalStatus.ACTIVE)) {
+        if (!rental.getStatus().equals(RentalStatus.CHECKED_OUT) &&
+                !rental.getStatus().equals(RentalStatus.ACTIVE)) {
             throw new RuntimeException("Cette location ne peut pas être clôturée");
         }
 
@@ -144,7 +147,7 @@ public class RentalService {
         rental.setTotalPrice(rental.getBasePrice().add(charges.getTotalCharges()));
 
         // 5. Clôturer la location
-        rental.setStatus(Rental.RentalStatus.CHECKED_IN);
+        rental.setStatus(RentalStatus.CHECKED_IN);
         Rental updatedRental = rentalRepository.save(rental);
 
         logger.info("Location clôturée avec succès: ID={}, Frais supplémentaires: {}",

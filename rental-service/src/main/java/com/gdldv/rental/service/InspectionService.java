@@ -1,6 +1,7 @@
 package com.gdldv.rental.service;
 
 import com.gdldv.rental.dto.VehicleInspectionDTO;
+import com.gdldv.rental.entity.InspectionType;
 import com.gdldv.rental.entity.Rental;
 import com.gdldv.rental.entity.VehicleInspection;
 import com.gdldv.rental.repository.VehicleInspectionRepository;
