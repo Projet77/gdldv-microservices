@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails du Véhicule - GDLDV</title>
+    <style>
+        /* Using the same styles as dashboard.html for consistency */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #111111 0%, #2f2f2f 100%);
+            min-height: 100vh;
+            color: #f6f6f6;
+        }
+
+        .navbar {
+            background: rgba(47, 47, 47, 0.5);
+            backdrop-filter: blur(20px);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 203, 116, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffcb74;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .card {
+            background: rgba(47, 47, 47, 0.4);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 203, 116, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 203, 116, 0.2);
+        }
+
+        .card-title {
+            color: #ffcb74;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .info-item {
+            margin-bottom: 15px;
+        }
+
+        .info-label {
+            color: rgba(246, 246, 246, 0.6);
+            font-size: 12px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <span>🚗</span>
+            <span>GDLDV - Admin</span>
+        </div>
+        <a th:href="@{/user/dashboard}" style="color: #ffcb74; text-decoration: none;">Retour au Dashboard</a>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title" th:text="${'Détails du Véhicule: ' + vehicle.make + ' ' + vehicle.model}">Détails du Véhicule</h1>
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Marque</div>
+                    <div class="info-value" th:text="${vehicle.make}">Toyota</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Modèle</div>
+                    <div class="info-value" th:text="${vehicle.model}">Camry</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Année</div>
+                    <div class="info-value" th:text="${vehicle.year}">2024</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Immatriculation</div>
+                    <div class="info-value" th:text="${vehicle.licensePlate}">DK-4532-AB</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Catégorie</div>
+                    <div class="info-value" th:text="${vehicle.category}">Berline</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Prix par jour</div>
+                    <div class="info-value" th:text="${vehicle.pricePerDay} + ' FCFA'">25,000 FCFA</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Statut</div>
+                    <div class="info-value" th:text="${vehicle.status}">Disponible</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Kilométrage</div>
+                    <div class="info-value" th:text="${vehicle.mileage} + ' km'">45,320 km</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Prochaine Maintenance</div>
+                    <div class="info-value" th:text="${vehicle.nextMaintenance}">01/03/2025</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Assurance</div>
+                    <div class="info-value" th:text="${vehicle.insuranceStatus}">OK</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Historique de Maintenance</h2>
+            </div>
+            <!-- Placeholder for maintenance history -->
+            <p>L'historique de maintenance sera affiché ici.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Historique des Locations</h2>
+            </div>
+            <!-- Placeholder for rental history -->
+            <p>L'historique des locations sera affiché ici.</p>
+        </div>
+    </div>
+</body>
+</html>

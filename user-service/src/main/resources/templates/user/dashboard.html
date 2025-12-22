@@ -304,6 +304,33 @@
             color: #ffcb74;
             font-size: 20px;
             font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .live-indicator {
+            width: 10px;
+            height: 10px;
+            background-color: #8fff9f;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #8fff9f, 0 0 12px #8fff9f;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.9);
+                box-shadow: 0 0 8px #8fff9f, 0 0 12px #8fff9f;
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 12px #8fff9f, 0 0 18px #8fff9f;
+            }
+            100% {
+                transform: scale(0.9);
+                box-shadow: 0 0 8px #8fff9f, 0 0 12px #8fff9f;
+            }
         }
 
         .card-action {
@@ -382,6 +409,12 @@
             background: rgba(255, 193, 7, 0.2);
             color: #ffc107;
             border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .status-warning {
+            background: rgba(255, 107, 84, 0.2);
+            color: #ff6b54;
+            border: 1px solid rgba(255, 107, 84, 0.3);
         }
 
         .status-completed {
@@ -1293,13 +1326,20 @@
             </div>
 
             <!-- B) KPI DASHBOARD -->
-            <div class="stats-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <span class="live-indicator"></span>
+                        KPI Dashboard Temps Réel
+                    </h3>
+                </div>
+                <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-header">
                         <div>
                             <div class="stat-title">Total Véhicules</div>
                             <div class="stat-value">48</div>
-                            <div class="stat-change">+3 ce mois</div>
+                            <div class="stat-change">▲ +3 ce mois</div>
                         </div>
                         <div class="stat-icon">🚗</div>
                     </div>
@@ -1332,7 +1372,7 @@
                         <div>
                             <div class="stat-title">En Maintenance</div>
                             <div class="stat-value">4</div>
-                            <div class="stat-change negative">8% indisponibles</div>
+                            <div class="stat-change negative">▼ 8% indisponibles</div>
                         </div>
                         <div class="stat-icon">🔧</div>
                     </div>
@@ -1343,7 +1383,7 @@
                         <div>
                             <div class="stat-title">Revenus Mois</div>
                             <div class="stat-value">2.4M</div>
-                            <div class="stat-change">+18% vs mois dernier</div>
+                            <div class="stat-change">▲ +18% vs mois dernier</div>
                         </div>
                         <div class="stat-icon">💰</div>
                     </div>
@@ -1354,7 +1394,7 @@
                         <div>
                             <div class="stat-title">Taux Occupation</div>
                             <div class="stat-value">78%</div>
-                            <div class="stat-change">+5% vs moyenne</div>
+                            <div class="stat-change">▲ +5% vs moyenne</div>
                         </div>
                         <div class="stat-icon">📊</div>
                     </div>
@@ -1365,7 +1405,7 @@
                         <div>
                             <div class="stat-title">Total Clients</div>
                             <div class="stat-value">342</div>
-                            <div class="stat-change">+28 ce mois</div>
+                            <div class="stat-change">▲ +28 ce mois</div>
                         </div>
                         <div class="stat-icon">👥</div>
                     </div>
@@ -1376,7 +1416,7 @@
                         <div>
                             <div class="stat-title">Réservations</div>
                             <div class="stat-value">156</div>
-                            <div class="stat-change">Ce mois</div>
+                            <div class="stat-change">▲ Ce mois</div>
                         </div>
                         <div class="stat-icon">📋</div>
                     </div>
@@ -1411,6 +1451,8 @@
                             <th>Prix/Jour</th>
                             <th>Statut</th>
                             <th>Kilométrage</th>
+                            <th>Proch. Maintenance</th>
+                            <th>Assurance</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -1427,7 +1469,7 @@
                             <td><span class="rental-status status-active">Disponible</span></td>
                             <td>45,320 km</td>
                             <td>
-                                <button class="btn btn-sm btn-outline" style="padding: 4px 8px;">👁️</button>
+                                <a th:href="@{/admin/vehicles/1}" class="btn btn-sm btn-outline" style="padding: 4px 8px;">👁️</a>
                                 <button class="btn btn-sm btn-outline" style="padding: 4px 8px;">✏️</button>
                             </td>
                         </tr>
@@ -1442,8 +1484,10 @@
                             <td>22,000 FCFA</td>
                             <td><span class="rental-status" style="background: rgba(255, 193, 7, 0.2); color: #ffc107; border: 1px solid rgba(255, 193, 7, 0.3);">En Location</span></td>
                             <td>38,756 km</td>
+                            <td>15/02/2025</td>
+                            <td>OK</td>
                             <td>
-                                <button class="btn btn-sm btn-outline" style="padding: 4px 8px;">👁️</button>
+                                <a th:href="@{/admin/vehicles/2}" class="btn btn-sm btn-outline" style="padding: 4px 8px;">👁️</a>
                                 <button class="btn btn-sm btn-outline" style="padding: 4px 8px;">✏️</button>
                             </td>
                         </tr>
@@ -1458,8 +1502,10 @@
                             <td>30,000 FCFA</td>
                             <td><span class="rental-status status-active">Disponible</span></td>
                             <td>12,450 km</td>
+                            <td>01/04/2025</td>
+                            <td>Expirée</td>
                             <td>
-                                <button class="btn btn-sm btn-outline" style="padding: 4px 8px;">👁️</button>
+                                <a th:href="@{/admin/vehicles/3}" class="btn btn-sm btn-outline" style="padding: 4px 8px;">👁️</a>
                                 <button class="btn btn-sm btn-outline" style="padding: 4px 8px;">✏️</button>
                             </td>
                         </tr>
@@ -1474,8 +1520,10 @@
                             <td>45,000 FCFA</td>
                             <td><span class="rental-status" style="background: rgba(220, 53, 69, 0.2); color: #ff6b7a; border: 1px solid rgba(220, 53, 69, 0.3);">Maintenance</span></td>
                             <td>67,890 km</td>
+                            <td>En cours</td>
+                            <td>OK</td>
                             <td>
-                                <button class="btn btn-sm btn-outline" style="padding: 4px 8px;">👁️</button>
+                                <a th:href="@{/admin/vehicles/4}" class="btn btn-sm btn-outline" style="padding: 4px 8px;">👁️</a>
                                 <button class="btn btn-sm btn-outline" style="padding: 4px 8px;">✏️</button>
                             </td>
                         </tr>
@@ -1490,8 +1538,10 @@
                             <td>35,000 FCFA</td>
                             <td><span class="rental-status status-active">Disponible</span></td>
                             <td>89,234 km</td>
+                            <td>01/02/2025</td>
+                            <td>OK</td>
                             <td>
-                                <button class="btn btn-sm btn-outline" style="padding: 4px 8px;">👁️</button>
+                                <a th:href="@{/admin/vehicles/5}" class="btn btn-sm btn-outline" style="padding: 4px 8px;">👁️</a>
                                 <button class="btn btn-sm btn-outline" style="padding: 4px 8px;">✏️</button>
                             </td>
                         </tr>
@@ -1546,6 +1596,26 @@
                     </div>
                 </div>
 
+                <div class="rental-card" style="background: rgba(255, 107, 84, 0.1); border-color: rgba(255, 107, 84, 0.3);">
+                    <div class="rental-card-header">
+                        <div class="rental-vehicle">
+                            <div class="vehicle-icon" style="font-size: 36px;">⚠️</div>
+                            <div class="vehicle-info">
+                                <h3 style="color: #ff6b54;">Pneu sous-gonflé</h3>
+                                <div class="conf-number">Toyota RAV4 2024 (DK-7823-EF)</div>
+                            </div>
+                        </div>
+                        <div class="rental-status status-warning">AVERTISSEMENT</div>
+                    </div>
+                    <div style="color: rgba(246, 246, 246, 0.8); font-size: 14px; margin-top: 10px;">
+                        Capteur de pression des pneus (TPMS) a détecté une faible pression.
+                    </div>
+                    <div class="rental-actions" style="margin-top: 15px;">
+                        <button class="btn btn-sm btn-primary">🔧 Inspecter</button>
+                        <button class="btn btn-sm btn-outline">📄 Voir Véhicule</button>
+                    </div>
+                </div>
+
                 <div class="rental-card" style="background: rgba(23, 162, 184, 0.1); border-color: rgba(23, 162, 184, 0.3);">
                     <div class="rental-card-header">
                         <div class="rental-vehicle">
@@ -1569,13 +1639,28 @@
             <!-- F) LOCATIONS ACTUELLES & RETARDS -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px;">
                 <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">🔑 Locations Actuelles</h3>
-                        <a href="#" class="card-action">Toutes (12) →</a>
-                    </div>
-
-                    <div class="rental-card">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                                    <div class="card-header">
+                                        <h3 class="card-title">🔑 Locations Actuelles</h3>
+                                        <a href="#" class="card-action">Toutes (12) →</a>
+                                    </div>
+                    
+                                    <div style="display: flex; gap: 15px; margin-bottom: 20px; align-items: center;">
+                                        <label for="sort-locations" style="font-size: 13px; color: rgba(246, 246, 246, 0.7);">Trier par:</label>
+                                        <select id="sort-locations" style="background: rgba(47, 47, 47, 0.6); border: 1px solid rgba(255, 203, 116, 0.3); border-radius: 8px; color: #f6f6f6; padding: 8px;">
+                                            <option>Date de retour</option>
+                                            <option>Date de début</option>
+                                            <option>Client</option>
+                                        </select>
+                                        <label for="filter-agency" style="font-size: 13px; color: rgba(246, 246, 246, 0.7);">Agence:</label>
+                                        <select id="filter-agency" style="background: rgba(47, 47, 47, 0.6); border: 1px solid rgba(255, 203, 116, 0.3); border-radius: 8px; color: #f6f6f6; padding: 8px;">
+                                            <option>Toutes</option>
+                                            <option>Agence Dakar</option>
+                                            <option>Agence Thiès</option>
+                                            <option>Agence Saly</option>
+                                        </select>
+                                    </div>
+                    
+                                    <div class="rental-card">                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
                             <div>
                                 <div style="color: #ffcb74; font-weight: 600; margin-bottom: 5px;">🚙 Toyota Camry 2024</div>
                                 <div style="font-size: 12px; color: rgba(246,246,246,0.6);">Client: Amadou Diallo</div>
@@ -1675,7 +1760,13 @@
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">📊 Rapports & Statistiques</h3>
-                    <div style="display: flex; gap: 10px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <select style="background: rgba(47, 47, 47, 0.6); border: 1px solid rgba(255, 203, 116, 0.3); border-radius: 8px; color: #f6f6f6; padding: 8px; font-size: 13px;">
+                            <option>30 derniers jours</option>
+                            <option>6 derniers mois</option>
+                            <option>Cette année</option>
+                            <option>Année dernière</option>
+                        </select>
                         <button class="btn btn-sm btn-outline">📥 Exporter PDF</button>
                         <button class="btn btn-sm btn-outline">📊 Rapport Complet</button>
                     </div>
