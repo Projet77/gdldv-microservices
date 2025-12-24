@@ -179,7 +179,7 @@ public class RentalService {
             long rentalDurationDays = ChronoUnit.DAYS.between(rental.getStartDate(), rental.getEndDate());
             if (rentalDurationDays < 1) rentalDurationDays = 1;
 
-            BigDecimal dailyRate = rental.getBasePrice().divide(BigDecimal.valueOf(rentalDurationDays), 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal dailyRate = rental.getBasePrice().divide(BigDecimal.valueOf(rentalDurationDays), 2, java.math.RoundingMode.HALF_UP);
             
             BigDecimal lateFee = dailyRate
                     .multiply(BigDecimal.valueOf(daysLate))

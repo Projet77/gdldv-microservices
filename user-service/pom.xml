@@ -51,6 +51,12 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <!-- Spring Data Redis (for caching) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
         <!-- Spring Cloud OpenFeign -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>

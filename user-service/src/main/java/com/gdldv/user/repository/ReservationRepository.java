@@ -16,6 +16,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findByUserId(Long userId);
     Page<Reservation> findByUserId(Long userId, Pageable pageable);
     Page<Reservation> findByUserIdAndStatus(Long userId, ReservationStatus status, Pageable pageable);
+    List<Reservation> findByUserIdAndStatus(Long userId, ReservationStatus status);
 
     // Nouvelles méthodes pour Sprint 3
     List<Reservation> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
@@ -23,4 +24,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findByStatusAndCreatedAtBefore(ReservationStatus status, LocalDateTime dateTime);
     List<Reservation> findByStatusAndEndDateBefore(ReservationStatus status, LocalDateTime dateTime);
     List<Reservation> findByStatusAndStartDateBefore(ReservationStatus status, LocalDateTime dateTime);
+
+    // Méthodes pour dashboards
+    List<Reservation> findByStartDateBetween(LocalDateTime start, LocalDateTime end);
+    List<Reservation> findByEndDateBetween(LocalDateTime start, LocalDateTime end);
 }

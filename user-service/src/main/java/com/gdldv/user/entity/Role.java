@@ -16,8 +16,10 @@ public class Role {
 
     public enum ERole {
         ROLE_CLIENT,
-        ROLE_EMPLOYEE,
-        ROLE_ADMIN
+        ROLE_AGENT,
+        ROLE_MANAGER,
+        ROLE_ADMIN,
+        ROLE_SUPER_ADMIN
     }
 
     public Role() {

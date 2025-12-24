@@ -1,0 +1,27 @@
+# Docker-specific gitignore
+# Add this content to your main .gitignore file
+
+# Environment variables (NEVER commit this!)
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Docker volumes data
+mysql-vehicle-data/
+mysql-reservation-data/
+mysql-user-data/
+mysql-rental-data/
+
+# Docker logs
+logs/
+*.log
+
+# Backup files
+backups/
+*.sql
+*.tar.gz
+
+# Temporary files
+tmp/
+temp/

@@ -84,7 +84,7 @@ public class BusinessMetricsService {
         // Calculer les KPIs financiers
         double totalRevenue = rentals.stream()
                 .filter(r -> r.getStatus() == RentalStatus.COMPLETED)
-                .mapToDouble(r -> r.getTotalPrice().doubleValue() != null ? r.getTotalPrice().doubleValue() : 0.0)
+                .mapToDouble(r -> r.getTotalPrice() != null ? r.getTotalPrice().doubleValue() : 0.0)
                 .sum();
 
         int totalBookings = rentals.size();
@@ -160,7 +160,7 @@ public class BusinessMetricsService {
                     int bookingCount = vehicleRentals.size();
                     double totalRevenue = vehicleRentals.stream()
                             .filter(r -> r.getStatus() == RentalStatus.COMPLETED)
-                            .mapToDouble(r -> r.getTotalPrice().doubleValue() != null ? r.getTotalPrice().doubleValue() : 0.0)
+                            .mapToDouble(r -> r.getTotalPrice() != null ? r.getTotalPrice().doubleValue() : 0.0)
                             .sum();
 
                     // Récupérer les infos du véhicule (brand, model) depuis le premier rental
@@ -236,7 +236,7 @@ public class BusinessMetricsService {
                 .filter(r -> r.getCreatedAt() != null)
                 .collect(Collectors.groupingBy(
                         r -> r.getCreatedAt().format(formatter),
-                        Collectors.summingDouble(r -> r.getTotalPrice().doubleValue() != null ? r.getTotalPrice().doubleValue() : 0.0)
+                        Collectors.summingDouble(r -> r.getTotalPrice() != null ? r.getTotalPrice().doubleValue() : 0.0)
                 ))
                 .entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
@@ -265,12 +265,12 @@ public class BusinessMetricsService {
         if (isRevenue) {
             currentValue = currentRentals.stream()
                     .filter(r -> r.getStatus() == RentalStatus.COMPLETED)
-                    .mapToDouble(r -> r.getTotalPrice().doubleValue() != null ? r.getTotalPrice().doubleValue() : 0.0)
+                    .mapToDouble(r -> r.getTotalPrice() != null ? r.getTotalPrice().doubleValue() : 0.0)
                     .sum();
 
             previousValue = previousRentals.stream()
                     .filter(r -> r.getStatus() == RentalStatus.COMPLETED)
-                    .mapToDouble(r -> r.getTotalPrice().doubleValue() != null ? r.getTotalPrice().doubleValue() : 0.0)
+                    .mapToDouble(r -> r.getTotalPrice() != null ? r.getTotalPrice().doubleValue() : 0.0)
                     .sum();
         } else {
             currentValue = currentRentals.size();
