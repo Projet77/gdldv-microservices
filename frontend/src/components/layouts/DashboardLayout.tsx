@@ -47,6 +47,7 @@ const NAV_CONFIG: Record<UserRole, NavItem[]> = {
         { label: 'Aperçu', href: '/dashboard/admin', icon: LayoutDashboard },
         { label: 'Flotte', href: '/dashboard/admin/vehicles', icon: Car },
         { label: 'Clients', href: '/dashboard/admin/users', icon: Users },
+        { label: 'Réservations', href: '/dashboard/admin/reservations', icon: CalendarDays },
         { label: 'Maintenance', href: '/dashboard/admin/maintenance', icon: AlertTriangle },
         { label: 'Rapports', href: '/dashboard/admin/reports', icon: FileText },
     ],
@@ -59,6 +60,7 @@ const NAV_CONFIG: Record<UserRole, NavItem[]> = {
     MANAGER: [
         { label: 'Tableau de bord', href: '/dashboard/manager', icon: LayoutDashboard },
         { label: 'Performance', href: '/dashboard/manager/performance', icon: Activity },
+        { label: 'Réservations', href: '/dashboard/manager/reservations', icon: CalendarDays },
         { label: 'Équipe', href: '/dashboard/manager/team', icon: Users },
         { label: 'Incidents', href: '/dashboard/manager/incidents', icon: AlertTriangle },
         { label: 'Finances', href: '/dashboard/manager/finance', icon: FileText },
@@ -66,6 +68,7 @@ const NAV_CONFIG: Record<UserRole, NavItem[]> = {
     SUPER_ADMIN: [
         { label: 'Vue Système', href: '/dashboard/superadmin', icon: Activity },
         { label: 'Flotte', href: '/dashboard/admin/vehicles', icon: Car },
+        { label: 'Réservations', href: '/dashboard/admin/reservations', icon: CalendarDays },
         { label: 'Utilisateurs', href: '/dashboard/superadmin/users', icon: Users },
         { label: 'Sécurité', href: '/dashboard/superadmin/security', icon: ShieldCheck },
         { label: 'Configuration', href: '/dashboard/superadmin/config', icon: Settings },

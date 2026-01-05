@@ -46,6 +46,9 @@ public class VehicleService {
                 .fuelType(request.getFuelType())
                 .transmission(request.getTransmission())
                 .description(request.getDescription())
+                .seats(request.getSeats())
+                .babySeat(request.getBabySeat())
+                .images(request.getImages())
                 .status(VehicleStatus.AVAILABLE)
                 .isActive(true)
                 .build();
@@ -82,9 +85,10 @@ public class VehicleService {
      */
     @Transactional(readOnly = true)
     public Page<VehicleResponse> searchVehicles(String brand, String model, String category,
-                                                 VehicleStatus status, Double minPrice,
-                                                 Double maxPrice, Pageable pageable) {
-        log.info("Searching vehicles with filters - brand: {}, model: {}, category: {}, status: {}, minPrice: {}, maxPrice: {}",
+            VehicleStatus status, Double minPrice,
+            Double maxPrice, Pageable pageable) {
+        log.info(
+                "Searching vehicles with filters - brand: {}, model: {}, category: {}, status: {}, minPrice: {}, maxPrice: {}",
                 brand, model, category, status, minPrice, maxPrice);
 
         return vehicleRepository.searchVehicles(brand, model, category, status, minPrice, maxPrice, pageable)
@@ -166,6 +170,15 @@ public class VehicleService {
         if (request.getStatus() != null) {
             vehicle.setStatus(request.getStatus());
         }
+        if (request.getSeats() != null) {
+            vehicle.setSeats(request.getSeats());
+        }
+        if (request.getBabySeat() != null) {
+            vehicle.setBabySeat(request.getBabySeat());
+        }
+        if (request.getImages() != null) {
+            vehicle.setImages(request.getImages());
+        }
 
         Vehicle updatedVehicle = vehicleRepository.save(vehicle);
         log.info("Vehicle updated successfully with ID: {}", updatedVehicle.getId());
@@ -206,6 +219,9 @@ public class VehicleService {
                 .fuelType(vehicle.getFuelType())
                 .transmission(vehicle.getTransmission())
                 .description(vehicle.getDescription())
+                .seats(vehicle.getSeats())
+                .babySeat(vehicle.getBabySeat())
+                .images(vehicle.getImages())
                 .status(vehicle.getStatus())
                 .isActive(vehicle.getIsActive())
                 .createdAt(vehicle.getCreatedAt())

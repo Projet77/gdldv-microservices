@@ -46,6 +46,18 @@ public class User {
     @Builder.Default
     private boolean emailVerified = false;
 
+    @Column(length = 10)
+    @Builder.Default
+    private String language = "FR";
+
+    @Column(length = 10)
+    @Builder.Default
+    private String currency = "CFA";
+
+    @Lob
+    @Column(name = "profile_image", columnDefinition = "LONGTEXT")
+    private String profileImage;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",

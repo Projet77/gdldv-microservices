@@ -66,6 +66,10 @@ public class UserService {
              user.setEmail(userDetails.getEmail());
         }
 
+        if (userDetails.getLanguage() != null) user.setLanguage(userDetails.getLanguage());
+        if (userDetails.getCurrency() != null) user.setCurrency(userDetails.getCurrency());
+        if (userDetails.getProfileImage() != null) user.setProfileImage(userDetails.getProfileImage());
+
         return userRepository.save(user);
     }
 

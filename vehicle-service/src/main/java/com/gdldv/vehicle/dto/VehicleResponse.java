@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -27,6 +28,10 @@ public class VehicleResponse {
     private String transmission;
     private String description;
     private VehicleStatus status;
+    private VehicleStatus status;
+    private Integer seats;
+    private Boolean babySeat;
+    private List<String> images;
     private Boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

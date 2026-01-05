@@ -1,5 +1,7 @@
 package com.gdldv.vehicle.dto;
 
+import java.util.List;
+
 import com.gdldv.vehicle.entity.VehicleStatus;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -30,4 +32,10 @@ public class UpdateVehicleRequest {
     private String transmission;
     private String description;
     private VehicleStatus status;
+
+    private Integer seats;
+
+    private Boolean babySeat;
+
+    private List<String> images;
 }

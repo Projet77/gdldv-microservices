@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8003/user-service';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 console.log('🚀 API Configuration:');
 console.log('  - VITE_API_URL from env:', import.meta.env.VITE_API_URL);

@@ -22,18 +22,21 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByStatus(ReservationStatus status);
 
+    long countByUserIdAndStatus(Long userId, ReservationStatus status);
+
     Optional<Reservation> findByStripePaymentIntentId(String stripePaymentIntentId);
 
     // Trouver les réservations qui chevauchent les dates
     @Query("SELECT r FROM Reservation r WHERE r.vehicleId = :vehicleId " +
-           "AND r.status != 'CANCELLED' " +
-           "AND ((r.startDate <= :endDate AND r.endDate >= :startDate))")
+            "AND r.status != 'CANCELLED' " +
+            "AND ((r.startDate <= :endDate AND r.endDate >= :startDate))")
     List<Reservation> findConflictingReservations(
-        @Param("vehicleId") Long vehicleId,
-        @Param("startDate") LocalDateTime startDate,
-        @Param("endDate") LocalDateTime endDate);
+            @Param("vehicleId") Long vehicleId,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
 
     List<Reservation> findByStartDateBetween(LocalDateTime startDate, LocalDateTime endDate);
 
-    List<Reservation> findByVehicleIdAndStartDateBetween(Long vehicleId, LocalDateTime startDate, LocalDateTime endDate);
+    List<Reservation> findByVehicleIdAndStartDateBetween(Long vehicleId, LocalDateTime startDate,
+            LocalDateTime endDate);
 }

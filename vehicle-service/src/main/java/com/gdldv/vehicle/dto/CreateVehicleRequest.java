@@ -1,5 +1,7 @@
 package com.gdldv.vehicle.dto;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -41,4 +43,10 @@ public class CreateVehicleRequest {
     private String transmission; // MANUELLE, AUTOMATIQUE
 
     private String description;
+
+    private Integer seats;
+
+    private Boolean babySeat;
+
+    private List<String> images;
 }

@@ -21,19 +21,19 @@ const SuperAdminOverview: React.FC = () => {
     ];
 
     const services = [
-        { name: 'User Service', status: 'Online', uptime: '99.9%', latency: '45ms' },
-        { name: 'Vehicle Service', status: 'Online', uptime: '99.8%', latency: '52ms' },
-        { name: 'Reservation Service', status: 'Online', uptime: '99.9%', latency: '38ms' },
-        { name: 'Payment Service', status: 'Online', uptime: '99.99%', latency: '65ms' },
-        { name: 'Notification Service', status: 'Warning', uptime: '98.5%', latency: '120ms' },
-        { name: 'Analytics Service', status: 'Offline', uptime: '0%', latency: '-' },
+        { name: 'Service Utilisateurs', status: 'Online', uptime: '99.9%', latency: '45ms' },
+        { name: 'Service Véhicules', status: 'Online', uptime: '99.8%', latency: '52ms' },
+        { name: 'Service Réservations', status: 'Online', uptime: '99.9%', latency: '38ms' },
+        { name: 'Service Paiements', status: 'Online', uptime: '99.99%', latency: '65ms' },
+        { name: 'Service Notifications', status: 'Online', uptime: '100%', latency: '20ms' }, // Updated status
+        { name: 'Service Analytique', status: 'Offline', uptime: '0%', latency: '-' },
     ];
 
     const activities = [
-        { user: 'Admin User', action: 'Promoted Client to Agent', time: '2 mins ago', icon: ShieldCheck, color: 'text-blue-500' },
-        { user: 'System', action: 'Automated Database Backup', time: '1 hour ago', icon: Database, color: 'text-green-500' },
-        { user: 'Manager John', action: 'Updated Pricing Rules', time: '3 hours ago', icon: DollarSign, color: 'text-yellow-500' },
-        { user: 'System', action: 'High Latency Detected on Notification Service', time: '5 hours ago', icon: AlertTriangle, color: 'text-red-500' },
+        { user: 'Admin Principal', action: 'A promu Client en Agent', time: 'il y a 2 min', icon: ShieldCheck, color: 'text-blue-500' },
+        { user: 'Système', action: 'Sauvegarde BDD Automatique', time: 'il y a 1h', icon: Database, color: 'text-green-500' },
+        { user: 'Manager Jean', action: 'Mise à jour des prix', time: 'il y a 3h', icon: DollarSign, color: 'text-yellow-500' },
+        { user: 'Système', action: 'Latence détectée (Service Notif)', time: 'il y a 5h', icon: AlertTriangle, color: 'text-red-500' },
     ];
 
     return (
@@ -84,7 +84,7 @@ const SuperAdminOverview: React.FC = () => {
                                 <div key={service.name} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
                                     <div className="flex items-center gap-3">
                                         <div className={`h-3 w-3 rounded-full ${service.status === 'Online' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' :
-                                                service.status === 'Warning' ? 'bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.6)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]'
+                                            service.status === 'Warning' ? 'bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.6)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]'
                                             }`} />
                                         <div>
                                             <p className="font-bold text-gray-900 text-sm">{service.name}</p>
@@ -93,9 +93,9 @@ const SuperAdminOverview: React.FC = () => {
                                     </div>
                                     <div className="text-right">
                                         <p className={`text-sm font-bold ${service.status === 'Online' ? 'text-green-600' :
-                                                service.status === 'Warning' ? 'text-yellow-600' : 'text-red-600'
+                                            service.status === 'Warning' ? 'text-yellow-600' : 'text-red-600'
                                             }`}>
-                                            {service.status}
+                                            {service.status === 'Online' ? 'En Ligne' : service.status === 'Offline' ? 'Hors Ligne' : 'Attention'}
                                         </p>
                                         <p className="text-xs text-gray-400">{service.latency}</p>
                                     </div>

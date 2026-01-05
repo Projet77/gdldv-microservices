@@ -28,6 +28,7 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final VehicleClient vehicleClient;
     private final PaymentService paymentService;
+    private final LoyaltyService loyaltyService;
     private final Random random = new Random();
 
     public List<Reservation> getAllReservations() {
@@ -73,8 +74,7 @@ public class ReservationService {
 
         // 2. Vérifier qu'il n'y a pas de conflit de dates
         List<Reservation> conflicts = reservationRepository.findConflictingReservations(
-            request.getVehicleId(), request.getStartDate(), request.getEndDate()
-        );
+                request.getVehicleId(), request.getStartDate(), request.getEndDate());
         if (!conflicts.isEmpty()) {
             throw new RuntimeException("Vehicle is not available for the selected dates");
         }
@@ -86,27 +86,36 @@ public class ReservationService {
         double optionsPrice = 0.0;
         if (request.getOptions() != null && !request.getOptions().isEmpty()) {
             optionsPrice = request.getOptions().stream()
-                .mapToDouble(opt -> opt.getOptionPrice() * opt.getQuantity())
-                .sum();
+                    .mapToDouble(opt -> opt.getOptionPrice() * opt.getQuantity())
+                    .sum();
         }
 
         double totalPrice = basePrice + optionsPrice;
+
+        // Apply Loyalty Discount
+        double discountPercent = loyaltyService.getDiscountPercentageForUser(request.getUserId());
+        if (discountPercent > 0) {
+            double discountAmount = totalPrice * (discountPercent / 100.0);
+            totalPrice -= discountAmount;
+            log.info("Applied loyalty discount of {}% ({} XOF). New total: {}", discountPercent, discountAmount,
+                    totalPrice);
+        }
 
         // 4. Générer un numéro de confirmation unique (CONF-XXXXX)
         String confirmationNumber = generateConfirmationNumber();
 
         // 5. Créer la réservation
         Reservation reservation = Reservation.builder()
-            .confirmationNumber(confirmationNumber)
-            .vehicleId(request.getVehicleId())
-            .userId(request.getUserId())
-            .startDate(request.getStartDate())
-            .endDate(request.getEndDate())
-            .totalPrice(totalPrice)
-            .status(ReservationStatus.PENDING)
-            .options(request.getOptions())
-            .notes(request.getNotes())
-            .build();
+                .confirmationNumber(confirmationNumber)
+                .vehicleId(request.getVehicleId())
+                .userId(request.getUserId())
+                .startDate(request.getStartDate())
+                .endDate(request.getEndDate())
+                .totalPrice(totalPrice)
+                .status(ReservationStatus.PENDING)
+                .options(request.getOptions())
+                .notes(request.getNotes())
+                .build();
 
         Reservation savedReservation = reservationRepository.save(reservation);
         log.info("Reservation created with confirmation number: {}", confirmationNumber);
@@ -143,8 +152,7 @@ public class ReservationService {
         String clientSecret = paymentService.createCheckoutSession(
                 reservationId,
                 reservation.getTotalPrice(),
-                customerEmail
-        );
+                customerEmail);
 
         log.info("Payment intent created for reservation: {}", reservationId);
         return clientSecret;
@@ -155,7 +163,8 @@ public class ReservationService {
         log.info("Confirming payment for intent: {}", paymentIntentId);
 
         Reservation reservation = reservationRepository.findByStripePaymentIntentId(paymentIntentId)
-                .orElseThrow(() -> new RuntimeException("Reservation not found for payment intent: " + paymentIntentId));
+                .orElseThrow(
+                        () -> new RuntimeException("Reservation not found for payment intent: " + paymentIntentId));
 
         boolean paymentSucceeded = paymentService.confirmPayment(paymentIntentId);
 
@@ -198,8 +207,8 @@ public class ReservationService {
         double optionsPrice = 0.0;
         if (reservation.getOptions() != null) {
             optionsPrice = reservation.getOptions().stream()
-                .mapToDouble(opt -> opt.getOptionPrice() * opt.getQuantity())
-                .sum();
+                    .mapToDouble(opt -> opt.getOptionPrice() * opt.getQuantity())
+                    .sum();
         }
         reservation.setTotalPrice(basePrice + optionsPrice);
 
@@ -256,7 +265,7 @@ public class ReservationService {
 
         // Calculer le remboursement si la réservation a été payée
         if (reservation.getStatus() == ReservationStatus.CONFIRMED ||
-            reservation.getStatus() == ReservationStatus.ACTIVE) {
+                reservation.getStatus() == ReservationStatus.ACTIVE) {
 
             if (reservation.getStripePaymentIntentId() != null) {
                 double refundAmount = calculateRefundAmount(reservation);
@@ -309,20 +318,20 @@ public class ReservationService {
      */
     private ReservationResponse mapToResponse(Reservation reservation, VehicleDTO vehicle) {
         return ReservationResponse.builder()
-            .id(reservation.getId())
-            .confirmationNumber(reservation.getConfirmationNumber())
-            .vehicleId(reservation.getVehicleId())
-            .userId(reservation.getUserId())
-            .startDate(reservation.getStartDate())
-            .endDate(reservation.getEndDate())
-            .totalPrice(reservation.getTotalPrice())
-            .status(reservation.getStatus())
-            .options(reservation.getOptions())
-            .stripePaymentIntentId(reservation.getStripePaymentIntentId())
-            .notes(reservation.getNotes())
-            .createdAt(reservation.getCreatedAt())
-            .updatedAt(reservation.getUpdatedAt())
-            .vehicle(vehicle)
-            .build();
+                .id(reservation.getId())
+                .confirmationNumber(reservation.getConfirmationNumber())
+                .vehicleId(reservation.getVehicleId())
+                .userId(reservation.getUserId())
+                .startDate(reservation.getStartDate())
+                .endDate(reservation.getEndDate())
+                .totalPrice(reservation.getTotalPrice())
+                .status(reservation.getStatus())
+                .options(reservation.getOptions())
+                .stripePaymentIntentId(reservation.getStripePaymentIntentId())
+                .notes(reservation.getNotes())
+                .createdAt(reservation.getCreatedAt())
+                .updatedAt(reservation.getUpdatedAt())
+                .vehicle(vehicle)
+                .build();
     }
 }

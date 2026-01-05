@@ -16,8 +16,11 @@ import AdminUsers from './pages/dashboard/admin/AdminUsers';
 import AdminVehicles from './pages/dashboard/admin/AdminVehicles';
 import AdminReports from './pages/dashboard/admin/AdminReports';
 import AdminMaintenance from './pages/dashboard/admin/AdminMaintenance';
+import AdminReservations from './pages/dashboard/admin/AdminReservations';
 import SuperAdminOverview from './pages/dashboard/superadmin/SuperAdminOverview';
 import SuperAdminUsers from './pages/dashboard/superadmin/SuperAdminUsers';
+import SuperAdminSecurity from './pages/dashboard/superadmin/SuperAdminSecurity';
+import SuperAdminConfig from './pages/dashboard/superadmin/SuperAdminConfig';
 import './index.css';
 
 const App: React.FC = () => {
@@ -49,6 +52,7 @@ const App: React.FC = () => {
         <Route path="/dashboard/manager" element={<DashboardLayout />}>
           <Route index element={<Navigate to="/dashboard/manager/overview" replace />} />
           <Route path="overview" element={<ManagerOverview />} />
+          <Route path="reservations" element={<AdminReservations />} />
         </Route>
 
         {/* Admin Dashboard routes */}
@@ -59,6 +63,7 @@ const App: React.FC = () => {
           <Route path="vehicles" element={<AdminVehicles />} />
           <Route path="reports" element={<AdminReports />} />
           <Route path="maintenance" element={<AdminMaintenance />} />
+          <Route path="reservations" element={<AdminReservations />} />
         </Route>
 
         {/* Super Admin Dashboard routes */}
@@ -66,6 +71,9 @@ const App: React.FC = () => {
           <Route index element={<Navigate to="/dashboard/superadmin/overview" replace />} />
           <Route path="overview" element={<SuperAdminOverview />} />
           <Route path="users" element={<SuperAdminUsers />} />
+          <Route path="security" element={<SuperAdminSecurity />} />
+          <Route path="config" element={<SuperAdminConfig />} />
+          <Route path="profile" element={<ClientProfile />} />
         </Route>
       </Routes>
     </BrowserRouter>
