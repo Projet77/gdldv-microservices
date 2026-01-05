@@ -1,11 +1,15 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8003';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8003/user-service';
+
+console.log('🚀 API Configuration:');
+console.log('  - VITE_API_URL from env:', import.meta.env.VITE_API_URL);
+console.log('  - API_BASE_URL used:', API_BASE_URL);
 
 // Créer une instance axios avec configuration
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 30000, // Augmenté à 30 secondes car le backend est lent
   headers: {
     'Content-Type': 'application/json',
   },

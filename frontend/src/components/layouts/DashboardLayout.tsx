@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard,
@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { authService } from '../../services/authService';
 
 // Utility for merging tailwind classes
 function cn(...inputs: ClassValue[]) {
@@ -63,10 +64,11 @@ const NAV_CONFIG: Record<UserRole, NavItem[]> = {
         { label: 'Finances', href: '/dashboard/manager/finance', icon: FileText },
     ],
     SUPER_ADMIN: [
-        { label: 'Vue Système', href: '/dashboard/super-admin', icon: Activity },
-        { label: 'Utilisateurs', href: '/dashboard/super-admin/users', icon: Users },
-        { label: 'Sécurité', href: '/dashboard/super-admin/security', icon: ShieldCheck },
-        { label: 'Configuration', href: '/dashboard/super-admin/config', icon: Settings },
+        { label: 'Vue Système', href: '/dashboard/superadmin', icon: Activity },
+        { label: 'Flotte', href: '/dashboard/admin/vehicles', icon: Car },
+        { label: 'Utilisateurs', href: '/dashboard/superadmin/users', icon: Users },
+        { label: 'Sécurité', href: '/dashboard/superadmin/security', icon: ShieldCheck },
+        { label: 'Configuration', href: '/dashboard/superadmin/config', icon: Settings },
     ]
 };
 
@@ -76,10 +78,24 @@ interface DashboardLayoutProps {
     userImage?: string;
 }
 
-export default function DashboardLayout({ role = "CLIENT", userName = "Utilisateur", userImage }: DashboardLayoutProps) {
+export default function DashboardLayout({ role: propRole, userName: propUserName, userImage }: DashboardLayoutProps) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const [currentUser, setCurrentUser] = useState<any>(null);
     const location = useLocation();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const user = authService.getCurrentUser();
+        if (user) {
+            setCurrentUser(user);
+        } else {
+            navigate('/login');
+        }
+    }, [navigate]);
+
+    const role = propRole || currentUser?.role || "CLIENT";
+    const userName = propUserName || currentUser?.name || currentUser?.email || "Utilisateur";
 
     const navItems = NAV_CONFIG[role];
 
@@ -173,6 +189,9 @@ export default function DashboardLayout({ role = "CLIENT", userName = "Utilisate
                     </button>
 
                     <div className="flex items-center gap-4 ml-auto">
+                        <span className="text-gray-700 mr-4 font-medium block">
+                            Bonjour, {currentUser ? currentUser.first_name || currentUser.firstName || currentUser.name : 'Utilisateur'}
+                        </span>
                         {/* Search */}
                         <div className="relative hidden md:block group">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-yellow-500 transition-colors" />
@@ -190,18 +209,66 @@ export default function DashboardLayout({ role = "CLIENT", userName = "Utilisate
                         </button>
 
                         {/* User Profile */}
-                        <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
-                            <div className="text-right hidden sm:block">
-                                <p className="text-sm font-bold text-gray-900">{userName}</p>
-                                <p className="text-xs text-gray-500 capitalize">{role.toLowerCase().replace('_', ' ')}</p>
-                            </div>
-                            <div className="h-10 w-10 rounded-full bg-black flex items-center justify-center text-yellow-400 font-bold border-2 border-yellow-400 shadow-md">
-                                {userImage ? (
-                                    <img src={userImage} alt={userName} className="h-full w-full rounded-full object-cover" />
-                                ) : (
-                                    userName.charAt(0)
-                                )}
-                            </div>
+                        {/* User Profile */}
+                        <div className="relative pl-4 border-l border-gray-200">
+                            <button
+                                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                                className="flex items-center gap-3 hover:bg-gray-50 rounded-full p-1 transition-colors focus:outline-none"
+                            >
+                                <div className="text-right block">
+                                    <p className="text-sm font-bold text-gray-900">{userName}</p>
+                                    <p className="text-xs text-gray-500 capitalize">{role.toLowerCase().replace('_', ' ')}</p>
+                                </div>
+                                <div className="h-10 w-10 rounded-full bg-black flex items-center justify-center text-yellow-400 font-bold border-2 border-yellow-400 shadow-md overflow-hidden">
+                                    {userImage ? (
+                                        <img src={userImage} alt={userName} className="h-full w-full object-cover" />
+                                    ) : (
+                                        userName.charAt(0)
+                                    )}
+                                </div>
+                                <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            {/* Dropdown Menu */}
+                            {isProfileOpen && (
+                                <>
+                                    <div
+                                        className="fixed inset-0 z-30 opacity-0"
+                                        onClick={() => setIsProfileOpen(false)}
+                                    />
+                                    <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-40 transform origin-top-right transition-all">
+                                        <div className="px-4 py-3 border-b border-gray-100">
+                                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Compte</p>
+                                            <p className="text-sm font-medium text-gray-900 truncate">{userName}</p>
+                                            <p className="text-xs text-gray-500 truncate">{currentUser?.email}</p>
+                                        </div>
+
+                                        <div className="p-2">
+                                            <button
+                                                onClick={() => {
+                                                    setIsProfileOpen(false);
+                                                    navigate(`/dashboard/${role.toLowerCase()}/profile`);
+                                                }}
+                                                className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-yellow-50 hover:text-yellow-600 transition-colors"
+                                            >
+                                                <Settings className="h-4 w-4" />
+                                                Voir le profil
+                                            </button>
+
+                                            <button
+                                                onClick={() => {
+                                                    setIsProfileOpen(false);
+                                                    handleLogout();
+                                                }}
+                                                className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-red-500 hover:bg-red-50 transition-colors mt-1"
+                                            >
+                                                <LogOut className="h-4 w-4" />
+                                                Déconnexion
+                                            </button>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </header>

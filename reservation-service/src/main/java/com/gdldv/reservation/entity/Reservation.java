@@ -44,6 +44,7 @@ public class Reservation {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private ReservationStatus status = ReservationStatus.PENDING;
 
     // Options additionnelles
