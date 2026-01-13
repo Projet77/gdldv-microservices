@@ -48,7 +48,7 @@ timeout /t 40 /nobreak >nul
 
 REM 7. API Gateway
 echo.
-echo [7/8] Démarrage API Gateway (Port 8080)...
+echo [7/8] Démarrage API Gateway (Port 8000)...
 start "API Gateway" cmd /k "cd api-gateway && mvn spring-boot:run"
 
 echo.

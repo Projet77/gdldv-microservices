@@ -23,7 +23,6 @@ import java.util.Map;
 @RequestMapping("/api/reservations")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*")
 @Tag(name = "Reservation", description = "API de gestion des réservations")
 public class ReservationController {
 
@@ -44,9 +43,12 @@ public class ReservationController {
     }
 
     @GetMapping("/user/{userId}")
-    @Operation(summary = "Récupérer les réservations d'un utilisateur")
-    public ResponseEntity<List<Reservation>> getReservationsByUserId(@PathVariable Long userId) {
-        return ResponseEntity.ok(reservationService.getReservationsByUserId(userId));
+    @Operation(summary = "Récupérer les réservations d'un utilisateur avec informations véhicule")
+    public ResponseEntity<List<ReservationResponse>> getReservationsByUserId(@PathVariable Long userId) {
+        log.info("Fetching reservations for user: {}", userId);
+        List<ReservationResponse> reservations = reservationService.getReservationsByUserIdWithVehicle(userId);
+        log.info("Found {} reservations for user {}", reservations.size(), userId);
+        return ResponseEntity.ok(reservations);
     }
 
     @GetMapping("/vehicle/{vehicleId}")
@@ -81,20 +83,27 @@ public class ReservationController {
 
     @PostMapping
     @Operation(summary = "Créer une nouvelle réservation")
-    public ResponseEntity<ReservationResponse> createReservation(@Valid @RequestBody CreateReservationRequest request) {
+    public ResponseEntity<?> createReservation(@Valid @RequestBody CreateReservationRequest request) {
+        log.info("========== CREATE RESERVATION REQUEST ==========");
         log.info("Received reservation request: {}", request);
+        log.info("User ID: {}, Vehicle ID: {}", request.getUserId(), request.getVehicleId());
+        log.info("Start Date: {}, End Date: {}", request.getStartDate(), request.getEndDate());
+        log.info("================================================");
         try {
             ReservationResponse createdReservation = reservationService.createReservation(request);
+            log.info("✅ Reservation created successfully: {}", createdReservation.getId());
             return ResponseEntity.status(HttpStatus.CREATED).body(createdReservation);
         } catch (RuntimeException e) {
-            log.error("Error creating reservation: {}", e.getMessage());
-            return ResponseEntity.badRequest().build();
+            log.error("❌ Error creating reservation: {}", e.getMessage(), e);
+            // Return the specific error message to the frontend
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Mettre à jour une réservation")
-    public ResponseEntity<ReservationResponse> updateReservation(@PathVariable Long id, @Valid @RequestBody Reservation reservation) {
+    public ResponseEntity<ReservationResponse> updateReservation(@PathVariable Long id,
+            @Valid @RequestBody Reservation reservation) {
         try {
             ReservationResponse updatedReservation = reservationService.updateReservation(id, reservation);
             return ResponseEntity.ok(updatedReservation);
@@ -111,6 +120,18 @@ public class ReservationController {
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             log.error("Error confirming reservation {}: {}", id, e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/{id}/start")
+    @Operation(summary = "Démarrer une réservation (Remise véhicule)")
+    public ResponseEntity<Void> startReservation(@PathVariable Long id) {
+        try {
+            reservationService.startReservation(id);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            log.error("Error starting reservation {}: {}", id, e.getMessage());
             return ResponseEntity.notFound().build();
         }
     }

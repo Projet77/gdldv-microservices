@@ -1,5 +1,6 @@
 package com.gdldv.reservation.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gdldv.reservation.entity.ReservationOption;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -21,9 +22,11 @@ public class CreateReservationRequest {
     private Long userId;
 
     @NotNull(message = "La date de début est obligatoire")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime startDate;
 
     @NotNull(message = "La date de fin est obligatoire")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime endDate;
 
     private List<ReservationOption> options;  // GPS, Siège bébé, Assurance

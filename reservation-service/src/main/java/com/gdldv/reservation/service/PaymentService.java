@@ -20,17 +20,23 @@ public class PaymentService {
     private String stripeApiKey;
 
     public String createCheckoutSession(Long reservationId, Double amount, String email) {
+        // Mock Mode Check
+        if (stripeApiKey == null || stripeApiKey.contains("REPLACE")) {
+            log.warn("Stripe API Key is invalid. Enabling MOCK MODE for reservation {}", reservationId);
+            return "mock_secret_" + reservationId;
+        }
+
         log.info("Creating Stripe checkout session for reservation: {}", reservationId);
 
         try {
             Stripe.apiKey = stripeApiKey;
 
             PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-                .setAmount((long) (amount * 100)) // Convert to cents
-                .setCurrency("xof") // CFA Franc
-                .setReceiptEmail(email)
-                .putMetadata("reservationId", reservationId.toString())
-                .build();
+                    .setAmount((long) (amount * 100)) // Convert to cents
+                    .setCurrency("xof") // CFA Franc
+                    .setReceiptEmail(email)
+                    .putMetadata("reservationId", reservationId.toString())
+                    .build();
 
             PaymentIntent paymentIntent = PaymentIntent.create(params);
 
@@ -69,9 +75,9 @@ public class PaymentService {
             Stripe.apiKey = stripeApiKey;
 
             RefundCreateParams params = RefundCreateParams.builder()
-                .setPaymentIntent(paymentIntentId)
-                .setAmount((long) (amount * 100)) // Convert to cents
-                .build();
+                    .setPaymentIntent(paymentIntentId)
+                    .setAmount((long) (amount * 100)) // Convert to cents
+                    .build();
 
             Refund refund = Refund.create(params);
 

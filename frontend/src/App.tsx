@@ -11,6 +11,9 @@ import ClientFavorites from './pages/dashboard/client/ClientFavorites';
 import ClientProfile from './pages/dashboard/client/ClientProfile';
 import AgentOverview from './pages/dashboard/agent/AgentOverview';
 import ManagerOverview from './pages/dashboard/manager/ManagerOverview';
+import ManagerReservations from './pages/dashboard/manager/ManagerReservations';
+import ManagerTeam from './pages/dashboard/manager/ManagerTeam';
+import ManagerReports from './pages/dashboard/manager/ManagerReports';
 import AdminOverview from './pages/dashboard/admin/AdminOverview';
 import AdminUsers from './pages/dashboard/admin/AdminUsers';
 import AdminVehicles from './pages/dashboard/admin/AdminVehicles';
@@ -37,6 +40,7 @@ const App: React.FC = () => {
           <Route index element={<Navigate to="/dashboard/client/overview" replace />} />
           <Route path="overview" element={<ClientOverview />} />
           <Route path="reservations" element={<ClientReservations />} />
+          <Route path="reservations/:id" element={<ClientReservations />} />
           <Route path="history" element={<ClientHistory />} />
           <Route path="favorites" element={<ClientFavorites />} />
           <Route path="profile" element={<ClientProfile />} />
@@ -52,7 +56,10 @@ const App: React.FC = () => {
         <Route path="/dashboard/manager" element={<DashboardLayout />}>
           <Route index element={<Navigate to="/dashboard/manager/overview" replace />} />
           <Route path="overview" element={<ManagerOverview />} />
-          <Route path="reservations" element={<AdminReservations />} />
+          <Route path="reservations" element={<ManagerReservations />} />
+          <Route path="team" element={<ManagerTeam />} />
+          <Route path="reports" element={<ManagerReports />} />
+          <Route path="profile" element={<ClientProfile />} />
         </Route>
 
         {/* Admin Dashboard routes */}
@@ -64,6 +71,7 @@ const App: React.FC = () => {
           <Route path="reports" element={<AdminReports />} />
           <Route path="maintenance" element={<AdminMaintenance />} />
           <Route path="reservations" element={<AdminReservations />} />
+          <Route path="profile" element={<ClientProfile />} />
         </Route>
 
         {/* Super Admin Dashboard routes */}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit2, Trash2, Eye, Armchair, Baby, LayoutGrid, LayoutList } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Eye, Armchair, Baby, LayoutGrid, LayoutList, Upload, X, XCircle } from 'lucide-react';
 import api from '../../../services/api';
 
 // Updated Interface matching Backend
@@ -56,6 +56,34 @@ const AdminVehicles: React.FC = () => {
         }
     };
 
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            const files = Array.from(e.target.files);
+            const promises = files.map(file => {
+                return new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result as string);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            Promise.all(promises).then(base64Images => {
+                setFormData(prev => ({
+                    ...prev,
+                    images: [...(prev.images || []), ...base64Images]
+                }));
+            });
+        }
+    };
+
+    const removeImage = (index: number) => {
+        setFormData(prev => ({
+            ...prev,
+            images: (prev.images || []).filter((_, i) => i !== index)
+        }));
+    };
+
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
@@ -90,7 +118,8 @@ const AdminVehicles: React.FC = () => {
         setSelectedVehicle(null);
         setFormData({
             brand: '', model: '', category: 'Berline', dailyPrice: 0,
-            licensePlate: '', seats: 5, babySeat: false, images: [], year: 2024
+            licensePlate: '', seats: 5, babySeat: false, images: [], year: 2024,
+            mileage: 0, fuelType: 'ESSENCE', transmission: 'AUTOMATIQUE'
         });
         setIsEditModalOpen(true);
     };
@@ -313,47 +342,70 @@ const AdminVehicles: React.FC = () => {
                             <div className="grid grid-cols-2 gap-6">
                                 <div>
                                     <label className="block text-sm font-bold mb-2">Marque</label>
-                                    <input className="w-full p-3 border rounded-xl" value={formData.brand} onChange={e => setFormData({ ...formData, brand: e.target.value })} required />
+                                    <input className="w-full p-3 border rounded-xl" value={formData.brand || ''} onChange={e => setFormData({ ...formData, brand: e.target.value })} required />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold mb-2">Modèle</label>
-                                    <input className="w-full p-3 border rounded-xl" value={formData.model} onChange={e => setFormData({ ...formData, model: e.target.value })} required />
+                                    <input className="w-full p-3 border rounded-xl" value={formData.model || ''} onChange={e => setFormData({ ...formData, model: e.target.value })} required />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold mb-2">Immatriculation</label>
-                                    <input className="w-full p-3 border rounded-xl" value={formData.licensePlate} onChange={e => setFormData({ ...formData, licensePlate: e.target.value })} required />
+                                    <input className="w-full p-3 border rounded-xl" value={formData.licensePlate || ''} onChange={e => setFormData({ ...formData, licensePlate: e.target.value })} required />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold mb-2">Prix / Jour (CFA)</label>
-                                    <input type="number" className="w-full p-3 border rounded-xl" value={formData.dailyPrice} onChange={e => setFormData({ ...formData, dailyPrice: Number(e.target.value) })} required />
+                                    <input type="number" className="w-full p-3 border rounded-xl" value={formData.dailyPrice || ''} onChange={e => setFormData({ ...formData, dailyPrice: Number(e.target.value) })} required />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold mb-2">Année Modèle</label>
-                                    <input type="number" className="w-full p-3 border rounded-xl" value={formData.year} onChange={e => setFormData({ ...formData, year: Number(e.target.value) })} />
+                                    <input type="number" className="w-full p-3 border rounded-xl" value={formData.year || ''} onChange={e => setFormData({ ...formData, year: Number(e.target.value) })} />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold mb-2">Kilométrage</label>
-                                    <input type="number" className="w-full p-3 border rounded-xl" value={formData.mileage} onChange={e => setFormData({ ...formData, mileage: Number(e.target.value) })} />
+                                    <input type="number" className="w-full p-3 border rounded-xl" value={formData.mileage || ''} onChange={e => setFormData({ ...formData, mileage: Number(e.target.value) })} />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold mb-2">Nombre de places</label>
-                                    <input type="number" className="w-full p-3 border rounded-xl" value={formData.seats} onChange={e => setFormData({ ...formData, seats: Number(e.target.value) })} />
+                                    <input type="number" className="w-full p-3 border rounded-xl" value={formData.seats || ''} onChange={e => setFormData({ ...formData, seats: Number(e.target.value) })} />
                                 </div>
                                 <div className="flex items-center gap-3 pt-8">
-                                    <input type="checkbox" id="babySeat" className="w-5 h-5 accent-yellow-400" checked={formData.babySeat} onChange={e => setFormData({ ...formData, babySeat: e.target.checked })} />
+                                    <input type="checkbox" id="babySeat" className="w-5 h-5 accent-yellow-400" checked={formData.babySeat || false} onChange={e => setFormData({ ...formData, babySeat: e.target.checked })} />
                                     <label htmlFor="babySeat" className="font-bold text-gray-700">Siège Bébé Disponible</label>
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold mb-2">Images (URLs séparées par des virgules)</label>
-                                <textarea
-                                    className="w-full p-3 border rounded-xl"
-                                    rows={3}
-                                    placeholder="https://example.com/car1.jpg, https://example.com/car2.jpg"
-                                    value={Array.isArray(formData.images) ? formData.images.join(', ') : formData.images}
-                                    onChange={e => setFormData({ ...formData, images: e.target.value.split(',').map(s => s.trim()) })}
-                                ></textarea>
+                                <label className="block text-sm font-bold mb-2">Images du véhicule</label>
+
+                                {/* Image Preview Grid */}
+                                {formData.images && formData.images.length > 0 && (
+                                    <div className="grid grid-cols-4 gap-4 mb-4">
+                                        {formData.images.map((img, idx) => (
+                                            <div key={idx} className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden group">
+                                                <img src={img} alt="" className="w-full h-full object-cover" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeImage(idx)}
+                                                    className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                                                >
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Upload Button */}
+                                <div className="flex items-center justify-center w-full">
+                                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50 hover:border-yellow-400 transition-colors">
+                                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                            <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                                            <p className="text-sm text-gray-500"><span className="font-bold">Cliquez pour ajouter</span> ou glissez-déposez</p>
+                                            <p className="text-xs text-gray-400">PNG, JPG (Max 5MB)</p>
+                                        </div>
+                                        <input type="file" className="hidden" multiple accept="image/*" onChange={handleImageUpload} />
+                                    </label>
+                                </div>
                             </div>
 
                             <div className="flex justify-end gap-3 pt-4">

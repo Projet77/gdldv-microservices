@@ -25,7 +25,7 @@ interface User {
     firstName: string;
     lastName: string;
     email: string;
-    roles: Role[];
+    roles: string; // Backend returns comma-separated string
     active: boolean;
 }
 
@@ -56,7 +56,17 @@ const SuperAdminUsers: React.FC = () => {
             // Assuming the gateway routes /user-service/api/users correctly
             // Or if using direct service port. Using 'api' axios instance which should be configured.
             const response = await api.get('/api/users');
-            setUsers(response.data);
+            // API returns ApiResponse { success, message, data: users[] }
+            const apiResponse = response.data;
+            if (Array.isArray(apiResponse.data)) {
+                setUsers(apiResponse.data);
+            } else if (Array.isArray(apiResponse)) {
+                // Fallback in case raw array is returned
+                setUsers(apiResponse);
+            } else {
+                console.error("Format de réponse inattendu:", apiResponse);
+                setUsers([]);
+            }
         } catch (error) {
             console.error("Error fetching users:", error);
         } finally {
@@ -81,14 +91,12 @@ const SuperAdminUsers: React.FC = () => {
 
             // Workaround: We'll create the user first, then update if needed, OR send roles array.
 
-            const roles = [{ name: formData.role }]; // Mock role object
-
             const payload = {
                 firstName: formData.firstName,
                 lastName: formData.lastName,
                 email: formData.email,
                 password: formData.password,
-                roles: roles
+                roles: [formData.role] // Send as Set<String>
             };
 
             await api.post('/api/users', payload);
@@ -106,18 +114,12 @@ const SuperAdminUsers: React.FC = () => {
         if (!selectedUser) return;
 
         try {
-            // For role update
-            const roles = [{ id: 99, name: formData.role }]; // ID is dummy, name matters if logic uses name lookup or cascade
-            // Wait, our backend might need existing ID for Roles if it doesn't cascade persist.
-            // To be safe, we should probably fetch roles to get IDs, but let's try sending Name.
-            // If it fails, we know we need to improve backend DTO handling.
-
             const payload = {
                 ...selectedUser,
                 firstName: formData.firstName,
                 lastName: formData.lastName,
                 email: formData.email,
-                roles: roles
+                roles: [formData.role] // Send as Set<String>
             };
 
             await api.put(`/api/users/${selectedUser.id}`, payload);
@@ -147,7 +149,7 @@ const SuperAdminUsers: React.FC = () => {
             lastName: user.lastName,
             email: user.email,
             password: '', // Keep empty
-            role: user.roles && user.roles.length > 0 ? user.roles[0].name : 'ROLE_CLIENT'
+            role: user.roles ? user.roles.split(',')[0].trim() : 'ROLE_CLIENT'
         });
         setIsEditOpen(true);
     };
@@ -219,14 +221,21 @@ const SuperAdminUsers: React.FC = () => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border ${user.roles && user.roles.some(r => r.name === 'ROLE_SUPER_ADMIN') ? 'bg-black text-yellow-400 border-black' :
-                                                user.roles && user.roles.some(r => r.name === 'ROLE_ADMIN') ? 'bg-purple-100 text-purple-700 border-purple-200' :
-                                                    user.roles && user.roles.some(r => r.name === 'ROLE_MANAGER') ? 'bg-blue-100 text-blue-700 border-blue-200' :
-                                                        user.roles && user.roles.some(r => r.name === 'ROLE_AGENT') ? 'bg-green-100 text-green-700 border-green-200' :
-                                                            'bg-gray-100 text-gray-600 border-gray-200'
-                                            }`}>
-                                            {user.roles && user.roles.length > 0 ? user.roles[0].name.replace('ROLE_', '') : 'CLIENT'}
-                                        </span>
+                                        <div className="flex flex-wrap gap-1">
+                                            {user.roles && user.roles.split(',').map((roleRaw, idx) => {
+                                                const roleName = roleRaw.trim();
+                                                return (
+                                                    <span key={idx} className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border ${roleName.includes('SUPER_ADMIN') ? 'bg-black text-yellow-400 border-black' :
+                                                        roleName.includes('ADMIN') ? 'bg-purple-100 text-purple-700 border-purple-200' :
+                                                            roleName.includes('MANAGER') ? 'bg-blue-100 text-blue-700 border-blue-200' :
+                                                                roleName.includes('AGENT') ? 'bg-green-100 text-green-700 border-green-200' :
+                                                                    'bg-gray-100 text-gray-600 border-gray-200'
+                                                        }`}>
+                                                        {roleName.replace('ROLE_', '')}
+                                                    </span>
+                                                );
+                                            })}
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className="flex items-center gap-1.5 text-sm font-medium text-green-600">

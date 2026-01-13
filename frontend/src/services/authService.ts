@@ -8,22 +8,21 @@ const mapRole = (backendRole: string): string => {
 export const authService = {
     login: async (credentials: any) => {
         console.log('🔐 Tentative de connexion avec:', credentials.email);
-        console.log('🌐 API Base URL:', import.meta.env.VITE_API_URL || 'http://localhost:8003/user-service');
-        console.log('📡 Full URL:', `${import.meta.env.VITE_API_URL || 'http://localhost:8003/user-service'}/api/auth/login`);
 
         const response = await api.post('/api/auth/login', credentials);
         if (response.data.token) {
             localStorage.setItem('token', response.data.token);
-            const user = response.data.user;
-
-            // Store user data with primary role
+            // Backend returns flat structure: { token, email, roles: string[], ... }
             const userData = {
-                ...user,
+                id: response.data.id,
+                email: response.data.email,
+                firstName: response.data.firstName,
+                lastName: response.data.lastName,
                 token: response.data.token,
-                role: user.roles && user.roles.length > 0
-                    ? mapRole(user.roles[0].name) // Roles are objects now {id, name}
+                role: response.data.roles && response.data.roles.length > 0
+                    ? mapRole(response.data.roles[0]) // Roles are strings strings ["ROLE_ADMIN"]
                     : 'CLIENT',
-                name: `${user.firstName || ''} ${user.lastName || ''}`.trim()
+                name: `${response.data.firstName || ''} ${response.data.lastName || ''}`.trim()
             };
             localStorage.setItem('user', JSON.stringify(userData));
         }
@@ -34,16 +33,17 @@ export const authService = {
         const response = await api.post('/api/auth/register', userData);
         if (response.data.token) {
             localStorage.setItem('token', response.data.token);
-            const user = response.data.user;
-
-            // Store user data with primary role
+            // Backend returns flat structure
             const userDataWithRole = {
-                ...user,
+                id: response.data.id,
+                email: response.data.email,
+                firstName: response.data.firstName,
+                lastName: response.data.lastName,
                 token: response.data.token,
-                role: user.roles && user.roles.length > 0
-                    ? mapRole(user.roles[0].name)
+                role: response.data.roles && response.data.roles.length > 0
+                    ? mapRole(response.data.roles[0])
                     : 'CLIENT',
-                name: `${user.firstName || ''} ${user.lastName || ''}`.trim()
+                name: `${response.data.firstName || ''} ${response.data.lastName || ''}`.trim()
             };
             localStorage.setItem('user', JSON.stringify(userDataWithRole));
         }

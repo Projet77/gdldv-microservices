@@ -48,7 +48,7 @@ public class Reservation {
     private ReservationStatus status = ReservationStatus.PENDING;
 
     // Options additionnelles
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<ReservationOption> options;
 
     // Stripe payment

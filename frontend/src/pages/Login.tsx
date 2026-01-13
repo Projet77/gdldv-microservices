@@ -20,8 +20,9 @@ export default function Login() {
 
             // Redirect based on role
             // response.user contains the user object with roles as objects [{id, name: 'ROLE_SUPER_ADMIN'}]
-            const user = response.user;
-            const userRoleName = user.roles && user.roles.length > 0 ? user.roles[0].name : 'ROLE_CLIENT';
+            // response IS the user object (flat structure from backend)
+            const user = response;
+            const userRoleName = user.roles && user.roles.length > 0 ? user.roles[0] : 'ROLE_CLIENT';
 
             const role = userRoleName.replace('ROLE_', '');
 

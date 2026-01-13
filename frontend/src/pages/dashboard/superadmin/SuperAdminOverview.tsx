@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Users,
     Server,
@@ -8,33 +8,156 @@ import {
     AlertTriangle,
     CheckCircle,
     Database,
-    Zap
+    Zap,
+    Loader
 } from 'lucide-react';
+import { superAdminService } from '../../../services/superAdminService';
+import type { SuperAdminDashboard, SystemHealth } from '../../../services/superAdminService';
 
 const SuperAdminOverview: React.FC = () => {
-    // Mock Data for Dashboard
-    const stats = [
-        { name: 'Utilisateurs Totaux', value: '2,543', change: '+12.5%', icon: Users, color: 'text-blue-500', bg: 'bg-blue-100' },
-        { name: ' Revenu Mensuel', value: '45,231 €', change: '+8.2%', icon: DollarSign, color: 'text-green-500', bg: 'bg-green-100' },
-        { name: 'Charge Système', value: '34%', change: '-2.1%', icon: Activity, color: 'text-yellow-500', bg: 'bg-yellow-100' },
-        { name: 'Services Actifs', value: '6/6', change: '100%', icon: Server, color: 'text-purple-500', bg: 'bg-purple-100' },
-    ];
+    const [dashboard, setDashboard] = useState<SuperAdminDashboard | null>(null);
+    const [systemHealth, setSystemHealth] = useState<SystemHealth | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const services = [
-        { name: 'Service Utilisateurs', status: 'Online', uptime: '99.9%', latency: '45ms' },
-        { name: 'Service Véhicules', status: 'Online', uptime: '99.8%', latency: '52ms' },
-        { name: 'Service Réservations', status: 'Online', uptime: '99.9%', latency: '38ms' },
-        { name: 'Service Paiements', status: 'Online', uptime: '99.99%', latency: '65ms' },
-        { name: 'Service Notifications', status: 'Online', uptime: '100%', latency: '20ms' }, // Updated status
-        { name: 'Service Analytique', status: 'Offline', uptime: '0%', latency: '-' },
-    ];
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                setError(null);
 
-    const activities = [
-        { user: 'Admin Principal', action: 'A promu Client en Agent', time: 'il y a 2 min', icon: ShieldCheck, color: 'text-blue-500' },
-        { user: 'Système', action: 'Sauvegarde BDD Automatique', time: 'il y a 1h', icon: Database, color: 'text-green-500' },
-        { user: 'Manager Jean', action: 'Mise à jour des prix', time: 'il y a 3h', icon: DollarSign, color: 'text-yellow-500' },
-        { user: 'Système', action: 'Latence détectée (Service Notif)', time: 'il y a 5h', icon: AlertTriangle, color: 'text-red-500' },
-    ];
+                console.log('🔒 [SuperAdminOverview] Fetching dashboard data...');
+
+                // Charger les données du dashboard et la santé système en parallèle
+                const [dashboardData, health] = await Promise.all([
+                    superAdminService.getSuperAdminDashboard(),
+                    superAdminService.getSystemHealth()
+                ]);
+
+                setDashboard(dashboardData);
+                setSystemHealth(health);
+                console.log('✅ [SuperAdminOverview] Dashboard data loaded successfully');
+            } catch (error: any) {
+                console.error('❌ [SuperAdminOverview] Error fetching dashboard:', error);
+                setError(error.response?.data?.message || 'Erreur lors du chargement du dashboard');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    // Sécuriser l'accès aux services (au cas où ce n'est pas un tableau)
+    const servicesList = Array.isArray(systemHealth?.services) ? systemHealth.services : [];
+
+    // Calculer les statistiques dynamiques
+    const stats = dashboard ? [
+        {
+            name: 'Utilisateurs Totaux',
+            value: dashboard.userStatistics.totalUsers.toLocaleString(),
+            change: `+${dashboard.userStatistics.newUsersThisMonth}`,
+            icon: Users,
+            color: 'text-blue-500',
+            bg: 'bg-blue-100'
+        },
+        {
+            name: 'Charge Système',
+            value: `${Math.round(dashboard.performanceMetrics.cpuUsage)}%`,
+            change: dashboard.performanceMetrics.cpuUsage > 50 ? 'Élevée' : 'Normale',
+            icon: Activity,
+            color: 'text-yellow-500',
+            bg: 'bg-yellow-100'
+        },
+        {
+            name: 'Services Actifs',
+            value: `${servicesList.filter(s => s.status === 'UP').length}/${servicesList.length}`,
+            change: systemHealth?.overallStatus === 'HEALTHY' ? '100%' : 'Dégradé',
+            icon: Server,
+            color: 'text-purple-500',
+            bg: 'bg-purple-100'
+        },
+        {
+            name: 'Mémoire Utilisée',
+            value: `${Math.round(dashboard.performanceMetrics.memoryUsage)}%`,
+            change: dashboard.performanceMetrics.memoryUsage > 70 ? 'Critique' : 'OK',
+            icon: Database,
+            color: 'text-green-500',
+            bg: 'bg-green-100'
+        },
+    ] : [];
+
+    // Mapper les services avec leurs statuts
+    const services = servicesList.map(service => ({
+        name: service.name,
+        status: service.status === 'UP' ? 'Online' : 'Offline',
+        uptime: service.status === 'UP' ? '99.9%' : '0%',
+        latency: service.status === 'UP' ? `${service.responseTime}ms` : '-'
+    }));
+
+    // Mapper les logs d'audit récents en activités
+    const activities = dashboard?.auditStatistics.recentLogs.slice(0, 4).map(log => {
+        let icon = ShieldCheck;
+        let color = 'text-blue-500';
+
+        if (log.action.includes('DELETE') || log.action.includes('BLOCK')) {
+            icon = AlertTriangle;
+            color = 'text-red-500';
+        } else if (log.action.includes('UPDATE')) {
+            icon = DollarSign;
+            color = 'text-yellow-500';
+        } else if (log.action.includes('CREATE')) {
+            icon = CheckCircle;
+            color = 'text-green-500';
+        }
+
+        const timeDiff = Math.floor((Date.now() - new Date(log.timestamp).getTime()) / 60000);
+        const timeStr = timeDiff < 60 ? `il y a ${timeDiff} min` : `il y a ${Math.floor(timeDiff / 60)}h`;
+
+        return {
+            user: log.userName || `Utilisateur #${log.userId}`,
+            action: log.action,
+            time: timeStr,
+            icon,
+            color
+        };
+    }) || [];
+
+    // État de chargement
+    if (loading) {
+        return (
+            <div className="max-w-7xl mx-auto flex items-center justify-center h-64">
+                <div className="text-center">
+                    <Loader className="w-12 h-12 animate-spin text-yellow-500 mx-auto mb-4" />
+                    <p className="text-gray-600 font-medium">Chargement des données système...</p>
+                    <p className="text-sm text-gray-400 mt-2">Analyse de l'infrastructure en cours...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // État d'erreur
+    if (error) {
+        return (
+            <div className="max-w-7xl mx-auto">
+                <div className="bg-red-50 border border-red-200 rounded-xl p-6">
+                    <div className="flex items-center gap-3">
+                        <AlertTriangle className="w-6 h-6 text-red-500" />
+                        <div>
+                            <h3 className="font-bold text-red-900">Erreur de chargement</h3>
+                            <p className="text-sm text-red-700 mt-1">{error}</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-red-700"
+                    >
+                        Réessayer
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8">

@@ -35,43 +35,48 @@ interface NavItem {
     icon: React.ElementType;
 }
 
+import { useTranslation } from 'react-i18next';
+
+// ... other imports
+
+// Note: We keep NAV_CONFIG with keys, but we don't need TRANSLATIONS here anymore.
+
 const NAV_CONFIG: Record<UserRole, NavItem[]> = {
+    // ... (NAV_CONFIG remains same, mapping roles to arrays of objects with 'label' being the translation key)
     CLIENT: [
-        { label: 'Tableau de bord', href: '/dashboard/client', icon: LayoutDashboard },
-        { label: 'Mes Réservations', href: '/dashboard/client/reservations', icon: CalendarDays },
-        { label: 'Historique', href: '/dashboard/client/history', icon: History },
-        { label: 'Favoris', href: '/dashboard/client/favorites', icon: Car },
-        { label: 'Mon Profil', href: '/dashboard/client/profile', icon: Settings },
+        { label: 'dashboard', href: '/dashboard/client', icon: LayoutDashboard },
+        { label: 'my_reservations', href: '/dashboard/client/reservations', icon: CalendarDays },
+        { label: 'history', href: '/dashboard/client/history', icon: History },
+        { label: 'favorites', href: '/dashboard/client/favorites', icon: Car },
+        { label: 'profile', href: '/dashboard/client/profile', icon: Settings },
     ],
     ADMIN: [
-        { label: 'Aperçu', href: '/dashboard/admin', icon: LayoutDashboard },
-        { label: 'Flotte', href: '/dashboard/admin/vehicles', icon: Car },
-        { label: 'Clients', href: '/dashboard/admin/users', icon: Users },
-        { label: 'Réservations', href: '/dashboard/admin/reservations', icon: CalendarDays },
-        { label: 'Maintenance', href: '/dashboard/admin/maintenance', icon: AlertTriangle },
-        { label: 'Rapports', href: '/dashboard/admin/reports', icon: FileText },
+        { label: 'overview', href: '/dashboard/admin', icon: LayoutDashboard },
+        { label: 'fleet', href: '/dashboard/admin/vehicles', icon: Car },
+        { label: 'clients', href: '/dashboard/admin/users', icon: Users },
+        { label: 'my_reservations', href: '/dashboard/admin/reservations', icon: CalendarDays },
+        { label: 'maintenance', href: '/dashboard/admin/maintenance', icon: AlertTriangle },
+        { label: 'reports', href: '/dashboard/admin/reports', icon: FileText },
     ],
     AGENT: [
-        { label: 'Accueil Agent', href: '/dashboard/agent', icon: LayoutDashboard },
-        { label: 'Départs / Retours', href: '/dashboard/agent/operations', icon: Car },
-        { label: 'Réservations', href: '/dashboard/agent/reservations', icon: CalendarDays },
-        { label: 'Clients', href: '/dashboard/agent/clients', icon: Users },
+        { label: 'agent_home', href: '/dashboard/agent', icon: LayoutDashboard },
+        { label: 'operations', href: '/dashboard/agent/operations', icon: Car },
+        { label: 'my_reservations', href: '/dashboard/agent/reservations', icon: CalendarDays },
+        { label: 'clients', href: '/dashboard/agent/clients', icon: Users },
     ],
     MANAGER: [
-        { label: 'Tableau de bord', href: '/dashboard/manager', icon: LayoutDashboard },
-        { label: 'Performance', href: '/dashboard/manager/performance', icon: Activity },
-        { label: 'Réservations', href: '/dashboard/manager/reservations', icon: CalendarDays },
-        { label: 'Équipe', href: '/dashboard/manager/team', icon: Users },
-        { label: 'Incidents', href: '/dashboard/manager/incidents', icon: AlertTriangle },
-        { label: 'Finances', href: '/dashboard/manager/finance', icon: FileText },
+        { label: 'dashboard', href: '/dashboard/manager', icon: LayoutDashboard },
+        { label: 'my_reservations', href: '/dashboard/manager/reservations', icon: CalendarDays },
+        { label: 'team', href: '/dashboard/manager/team', icon: Users },
+        { label: 'reports', href: '/dashboard/manager/reports', icon: FileText },
     ],
     SUPER_ADMIN: [
-        { label: 'Vue Système', href: '/dashboard/superadmin', icon: Activity },
-        { label: 'Flotte', href: '/dashboard/admin/vehicles', icon: Car },
-        { label: 'Réservations', href: '/dashboard/admin/reservations', icon: CalendarDays },
-        { label: 'Utilisateurs', href: '/dashboard/superadmin/users', icon: Users },
-        { label: 'Sécurité', href: '/dashboard/superadmin/security', icon: ShieldCheck },
-        { label: 'Configuration', href: '/dashboard/superadmin/config', icon: Settings },
+        { label: 'system_view', href: '/dashboard/superadmin', icon: Activity },
+        { label: 'fleet', href: '/dashboard/admin/vehicles', icon: Car },
+        { label: 'my_reservations', href: '/dashboard/admin/reservations', icon: CalendarDays },
+        { label: 'users', href: '/dashboard/superadmin/users', icon: Users },
+        { label: 'security', href: '/dashboard/superadmin/security', icon: ShieldCheck },
+        { label: 'configuration', href: '/dashboard/superadmin/config', icon: Settings },
     ]
 };
 
@@ -82,6 +87,7 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({ role: propRole, userName: propUserName, userImage }: DashboardLayoutProps) {
+    const { t } = useTranslation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [currentUser, setCurrentUser] = useState<any>(null);
@@ -89,23 +95,34 @@ export default function DashboardLayout({ role: propRole, userName: propUserName
     const navigate = useNavigate();
 
     useEffect(() => {
-        const user = authService.getCurrentUser();
-        if (user) {
-            setCurrentUser(user);
-        } else {
-            navigate('/login');
-        }
+        const loadUser = () => {
+            const user = authService.getCurrentUser();
+            if (user) {
+                setCurrentUser(user);
+            } else {
+                navigate('/login');
+            }
+        };
+
+        loadUser();
+
+        // Listen for profile updates
+        window.addEventListener('user-updated', loadUser);
+
+        return () => {
+            window.removeEventListener('user-updated', loadUser);
+        };
     }, [navigate]);
 
     const role = propRole || currentUser?.role || "CLIENT";
     const userName = propUserName || currentUser?.name || currentUser?.email || "Utilisateur";
 
-    const navItems = NAV_CONFIG[role];
+    // Handle case where role might have ROLE_ prefix or be invalid
+    const normalizedRole = role.startsWith('ROLE_') ? role.replace('ROLE_', '') as UserRole : role;
+    const navItems = NAV_CONFIG[normalizedRole] || NAV_CONFIG['CLIENT'];
 
     const handleLogout = () => {
-        // TODO: Implement actual logout logic (clear tokens, etc.)
-        console.log("Logging out...");
-        navigate('/login');
+        authService.logout();
     };
 
     return (
@@ -161,7 +178,7 @@ export default function DashboardLayout({ role: propRole, userName: propUserName
                                     )}
                                 >
                                     <item.icon className={cn("h-5 w-5", isActive ? "text-black" : "text-gray-400 Group-hover:text-white")} />
-                                    {item.label}
+                                    {t(item.label)}
                                 </NavLink>
                             );
                         })}
@@ -174,7 +191,7 @@ export default function DashboardLayout({ role: propRole, userName: propUserName
                             className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-bold text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
                         >
                             <LogOut className="h-5 w-5" />
-                            Déconnexion
+                            {t('logout')}
                         </button>
                     </div>
                 </div>
@@ -193,14 +210,14 @@ export default function DashboardLayout({ role: propRole, userName: propUserName
 
                     <div className="flex items-center gap-4 ml-auto">
                         <span className="text-gray-700 mr-4 font-medium block">
-                            Bonjour, {currentUser ? currentUser.first_name || currentUser.firstName || currentUser.name : 'Utilisateur'}
+                            {t('hello')}, {currentUser ? currentUser.first_name || currentUser.firstName || currentUser.name : 'Utilisateur'}
                         </span>
                         {/* Search */}
                         <div className="relative hidden md:block group">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-yellow-500 transition-colors" />
                             <input
                                 type="text"
-                                placeholder="Rechercher..."
+                                placeholder={t('search')}
                                 className="pl-9 pr-4 py-2.5 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent w-64 transition-all bg-gray-50 focus:bg-white"
                             />
                         </div>
@@ -212,7 +229,6 @@ export default function DashboardLayout({ role: propRole, userName: propUserName
                         </button>
 
                         {/* User Profile */}
-                        {/* User Profile */}
                         <div className="relative pl-4 border-l border-gray-200">
                             <button
                                 onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -223,8 +239,8 @@ export default function DashboardLayout({ role: propRole, userName: propUserName
                                     <p className="text-xs text-gray-500 capitalize">{role.toLowerCase().replace('_', ' ')}</p>
                                 </div>
                                 <div className="h-10 w-10 rounded-full bg-black flex items-center justify-center text-yellow-400 font-bold border-2 border-yellow-400 shadow-md overflow-hidden">
-                                    {userImage ? (
-                                        <img src={userImage} alt={userName} className="h-full w-full object-cover" />
+                                    {userImage || currentUser?.profileImage ? (
+                                        <img src={userImage || currentUser?.profileImage} alt={userName} className="h-full w-full object-cover" />
                                     ) : (
                                         userName.charAt(0)
                                     )}
@@ -241,7 +257,7 @@ export default function DashboardLayout({ role: propRole, userName: propUserName
                                     />
                                     <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-40 transform origin-top-right transition-all">
                                         <div className="px-4 py-3 border-b border-gray-100">
-                                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Compte</p>
+                                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('account')}</p>
                                             <p className="text-sm font-medium text-gray-900 truncate">{userName}</p>
                                             <p className="text-xs text-gray-500 truncate">{currentUser?.email}</p>
                                         </div>
@@ -250,12 +266,12 @@ export default function DashboardLayout({ role: propRole, userName: propUserName
                                             <button
                                                 onClick={() => {
                                                     setIsProfileOpen(false);
-                                                    navigate(`/dashboard/${role.toLowerCase()}/profile`);
+                                                    navigate(`/dashboard/${normalizedRole.toLowerCase()}/profile`);
                                                 }}
                                                 className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-yellow-50 hover:text-yellow-600 transition-colors"
                                             >
                                                 <Settings className="h-4 w-4" />
-                                                Voir le profil
+                                                {t('view_profile')}
                                             </button>
 
                                             <button
@@ -266,7 +282,7 @@ export default function DashboardLayout({ role: propRole, userName: propUserName
                                                 className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-red-500 hover:bg-red-50 transition-colors mt-1"
                                             >
                                                 <LogOut className="h-4 w-4" />
-                                                Déconnexion
+                                                {t('logout')}
                                             </button>
                                         </div>
                                     </div>

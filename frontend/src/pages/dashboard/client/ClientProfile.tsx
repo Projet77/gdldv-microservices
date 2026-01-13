@@ -52,18 +52,38 @@ const ClientProfile: React.FC = () => {
         try {
             if (!user?.id) return;
 
-            const response = await api.put(`/api/users/${user.id}`, {
-                ...user,
+            const response = await api.put('/api/users/profile', {
                 firstName: formData.firstName,
                 lastName: formData.lastName,
-                email: formData.email,
                 profileImage: formData.profileImage
+                // Add other fields from UpdateProfileRequest if they were in the form (phone, address, etc.)
+                // email is typically read-only or updated via a separate flow
             });
 
             // Update local storage
-            const updatedUser = response.data;
+            const apiResponse = response.data; // ApiResponse wrapper
+            const profileData = apiResponse.data; // Actual UserProfileResponse
+
+            // We must merge with existing user to keep the TOKEN and other session fields
+            // Map backend 'roles' (string "ROLE_ADMIN") to frontend 'role' (string "ROLE_ADMIN") behavior
+            const updatedUser = {
+                ...user, // Keep existing token and format
+                ...profileData, // Update profile fields (firstName, lastName, etc.)
+                role: user.role // Keep the role from session as profile update doesn't return role usually, or logic below
+            };
+
+            // If API returns roles, we can update it, but usually profile update doesn't change roles.
+            // If it does (e.g. "ROLE_ADMIN"):
+            if (profileData.roles) {
+                // Ensure we strip 'ROLE_' to match frontend convention ("ADMIN")
+                updatedUser.role = profileData.roles.replace('ROLE_', '');
+            }
+
             localStorage.setItem('user', JSON.stringify(updatedUser)); // Update stored user session
             setUser(updatedUser);
+
+            // Notify other components (like Navbar) that user data has changed
+            window.dispatchEvent(new Event('user-updated'));
 
             setMessage({ type: 'success', text: 'Profil mis à jour avec succès !' });
         } catch (error) {

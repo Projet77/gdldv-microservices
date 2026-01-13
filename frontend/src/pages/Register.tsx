@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Car, Lock, Mail, User } from 'lucide-react';
+import { authService } from '../services/authService';
 
 export default function Register() {
     const navigate = useNavigate();
@@ -8,12 +9,46 @@ export default function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleRegister = (e: React.FormEvent) => {
+    const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Simulation register logic
-        // In a real app, this would call an API
-        navigate('/dashboard/client');
+        setError('');
+
+        // Validation
+        if (password !== confirmPassword) {
+            setError('Les mots de passe ne correspondent pas');
+            return;
+        }
+
+        if (password.length < 6) {
+            setError('Le mot de passe doit contenir au moins 6 caractères');
+            return;
+        }
+
+        // Parse name into firstName and lastName
+        const nameParts = name.trim().split(' ');
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.slice(1).join(' ') || nameParts[0];
+
+        setLoading(true);
+        try {
+            await authService.register({
+                firstName,
+                lastName,
+                email,
+                password
+            });
+
+            // Navigate to dashboard after successful registration
+            navigate('/dashboard/client');
+        } catch (err: any) {
+            console.error('Registration error:', err);
+            setError(err.response?.data?.message || 'Erreur lors de l\'inscription');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -42,6 +77,12 @@ export default function Register() {
 
                     <h1 className="text-4xl font-black text-gray-900 mb-3 tracking-tight">Créer un compte.</h1>
                     <p className="text-gray-500 mb-10 text-lg">Rejoignez l'élite de la location automobile.</p>
+
+                    {error && (
+                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6">
+                            {error}
+                        </div>
+                    )}
 
                     <form onSubmit={handleRegister} className="space-y-6">
 
@@ -103,9 +144,11 @@ export default function Register() {
 
                         <button
                             type="submit"
-                            className="w-full bg-black text-white font-bold py-4 rounded-xl hover:bg-zinc-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center gap-2"
+                            disabled={loading}
+                            className="w-full bg-black text-white font-bold py-4 rounded-xl hover:bg-zinc-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                         >
-                            S'inscrire <ArrowRight className="w-5 h-5" />
+                            {loading ? 'Inscription en cours...' : "S'inscrire"}
+                            {!loading && <ArrowRight className="w-5 h-5" />}
                         </button>
                     </form>
 

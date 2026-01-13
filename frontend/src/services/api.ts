@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+// Hardcode Gateway URL to prevent misconfiguration
+const API_BASE_URL = 'http://localhost:8000';
 
 console.log('🚀 API Configuration:');
-console.log('  - VITE_API_URL from env:', import.meta.env.VITE_API_URL);
 console.log('  - API_BASE_URL used:', API_BASE_URL);
 
 // Créer une instance axios avec configuration
@@ -20,7 +20,10 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
+      console.log('🔑 [API] Attaching Token:', token.substring(0, 15) + '...');
       config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      console.warn('⚠️ [API] No Token found in localStorage');
     }
     return config;
   },
@@ -31,13 +34,46 @@ api.interceptors.request.use(
 
 // Intercepteur pour gérer les erreurs
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('✅ [API] Response OK:', response.config.url);
+    return response;
+  },
   (error) => {
-    if (error.response?.status === 401) {
-      // Token expiré ou invalide
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+    const status = error.response?.status;
+    const url = error.config?.url;
+
+    console.error('❌ [API] Request Failed:', {
+      url,
+      status,
+      message: error.response?.data?.message || error.message,
+      data: error.response?.data // Log full data part to catch custom error fields like "error": "msg"
+    });
+
+    // Ne déconnecter que pour les erreurs d'authentification sur les endpoints protégés
+    // Éviter de déconnecter si c'est juste un endpoint qui n'existe pas encore
+    if (status === 401) {
+      const isAuthEndpoint = url?.includes('/api/auth/');
+
+      // Si c'est un endpoint d'auth qui échoue, c'est un vrai problème d'auth
+      if (isAuthEndpoint) {
+        console.warn('⚠️ [API] Auth endpoint failed - logging out');
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      } else {
+        // Pour les autres endpoints, logger mais laisser la page gérer l'erreur
+        console.warn('⚠️ [API] 401 on protected endpoint:', url);
+        console.warn('⚠️ Token may be invalid or endpoint requires different permissions');
+
+        // Vérifier si le token existe encore
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.error('❌ [API] No token found - redirecting to login');
+          window.location.href = '/login';
+        }
+      }
     }
+
     return Promise.reject(error);
   }
 );

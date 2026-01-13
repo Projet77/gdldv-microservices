@@ -33,7 +33,19 @@ export default function VehicleDetailModal({ vehicle, isOpen, onClose }: Vehicle
   const handleReservation = () => {
     const isConnected = !!localStorage.getItem('token');
     if (isConnected) {
-      navigate('/dashboard/client/reservations', { state: { selectedVehicle: vehicle } });
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const role = user.role || 'CLIENT';
+
+      const dashboardRoutes: Record<string, string> = {
+        'SUPER_ADMIN': '/dashboard/superadmin',
+        'ADMIN': '/dashboard/admin',
+        'MANAGER': '/dashboard/manager',
+        'AGENT': '/dashboard/agent',
+        'CLIENT': '/dashboard/client/reservations'
+      };
+
+      const targetRoute = dashboardRoutes[role] || '/dashboard/client/reservations';
+      navigate(targetRoute, { state: { selectedVehicle: vehicle } });
     } else {
       navigate('/login', { state: { returnTo: '/dashboard/client/reservations', selectedVehicle: vehicle } });
     }

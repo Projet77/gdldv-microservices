@@ -3,162 +3,53 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Star, Shield, Zap, Car } from 'lucide-react';
 import VehicleDetailModal, { Vehicle } from '../components/public/VehicleDetailModal';
 
-// MOCK DATA GENERATOR
-const GENERATED_VEHICLES: Vehicle[] = [
-  {
-    id: '1', brand: 'Lamborghini', model: 'Urus', year: 2024, category: 'SUV Sport',
-    image: '/images/suv_car.png', pricePerDay: 250000, seats: 5, transmission: 'Automatique',
-    fuel: 'Essence', hasBabySeat: true, hasGPS: true, minAge: 25,
-    description: 'Le SUV le plus rapide du monde. Puissance brute et luxe absolu.'
-  },
-  {
-    id: '2', brand: 'Ferrari', model: 'F8 Tributo', year: 2023, category: 'Supercar',
-    image: '/images/sport_car.png', pricePerDay: 350000, seats: 2, transmission: 'Automatique',
-    fuel: 'Essence', hasBabySeat: false, hasGPS: true, minAge: 30,
-    description: 'Une icône de Maranello. V8 biturbo, 720 chevaux.'
-  },
-  {
-    id: '3', brand: 'Mercedes-Benz', model: 'G63 AMG', year: 2024, category: 'SUV Luxe',
-    image: '/images/suv_car.png', pricePerDay: 200000, seats: 5, transmission: 'Automatique',
-    fuel: 'Essence', hasBabySeat: true, hasGPS: true, minAge: 25,
-    description: 'Le roi des 4x4. Imposant, bruyant, luxueux.'
-  },
-  {
-    id: '4', brand: 'Porsche', model: '911 GT3', year: 2023, category: 'Sport',
-    image: '/images/sport_car.png', pricePerDay: 280000, seats: 2, transmission: 'Automatique',
-    fuel: 'Essence', hasBabySeat: false, hasGPS: true, minAge: 28,
-    description: 'La perfection sur circuit et sur route.'
-  },
-  {
-    id: '5', brand: 'Range Rover', model: 'Autobiography', year: 2024, category: 'SUV Luxe',
-    image: '/images/suv_car.png', pricePerDay: 180000, seats: 5, transmission: 'Automatique',
-    fuel: 'Diesel', hasBabySeat: true, hasGPS: true, minAge: 25,
-    description: 'Le summum du confort britannique.'
-  },
-  {
-    id: '6', brand: 'Audi', model: 'RSQ8', year: 2023, category: 'SUV Sport',
-    image: '/images/suv_car.png', pricePerDay: 190000, seats: 5, transmission: 'Automatique',
-    fuel: 'Essence', hasBabySeat: true, hasGPS: true, minAge: 25,
-    description: 'La cousine technique de l\'Urus, plus discrète mais tout aussi redoutable.'
-  },
-  {
-    id: '7', brand: 'Bentley', model: 'Continental GT', year: 2022, category: 'Grand Tourisme',
-    image: '/images/hero.png', pricePerDay: 300000, seats: 4, transmission: 'Automatique',
-    fuel: 'Essence', hasBabySeat: true, hasGPS: true, minAge: 30,
-    description: 'Voyagez en première classe, au volant.'
-  },
-  {
-    id: '8', brand: 'Rolls Royce', model: 'Cullinan', year: 2024, category: 'Ultra Luxe',
-    image: '/images/suv_car.png', pricePerDay: 500000, seats: 4, transmission: 'Automatique',
-    fuel: 'Essence', hasBabySeat: true, hasGPS: true, minAge: 35,
-    description: 'Le SUV le plus luxueux jamais construit.'
-  },
-  {
-    id: '9', brand: 'McLaren', model: '720S', year: 2023, category: 'Supercar',
-    image: '/images/sport_car.png', pricePerDay: 320000, seats: 2, transmission: 'Automatique',
-    fuel: 'Essence', hasBabySeat: false, hasGPS: true, minAge: 30,
-    description: 'Une aérodynamique sculptée par le vent.'
-  },
-  {
-    id: '10', brand: 'Tesla', model: 'Model X Plaid', year: 2024, category: 'Électrique',
-    image: '/images/suv_car.png', pricePerDay: 150000, seats: 6, transmission: 'Automatique',
-    fuel: 'Électrique', hasBabySeat: true, hasGPS: true, minAge: 25,
-    description: '1020 chevaux, électrique, familial. Falcon Wings.'
-  },
-  {
-    id: '11', brand: 'BMW', model: 'M4 Competition', year: 2024, category: 'Sport',
-    image: '/images/sport_car.png', pricePerDay: 160000, seats: 4, transmission: 'Automatique',
-    fuel: 'Essence', hasBabySeat: true, hasGPS: true, minAge: 25,
-    description: 'Le coupé sportif par excellence.'
-  },
-  {
-    id: '12', brand: 'Aston Martin', model: 'DBX 707', year: 2023, category: 'SUV Sport',
-    image: '/images/suv_car.png', pricePerDay: 260000, seats: 5, transmission: 'Automatique',
-    fuel: 'Essence', hasBabySeat: true, hasGPS: true, minAge: 30,
-    description: 'Le SUV de James Bond. 707 chevaux.'
-  },
-  {
-    id: '13', brand: 'Porsche', model: 'Taycan Turbo S', year: 2024, category: 'Électrique',
-    image: '/images/sport_car.png', pricePerDay: 220000, seats: 4, transmission: 'Automatique',
-    fuel: 'Électrique', hasBabySeat: true, hasGPS: true, minAge: 28,
-    description: 'L\'âme de Porsche, le cœur électrique.'
-  },
-  {
-    id: '14', brand: 'Maserati', model: 'MC20', year: 2023, category: 'Supercar',
-    image: '/images/sport_car.png', pricePerDay: 290000, seats: 2, transmission: 'Automatique',
-    fuel: 'Essence', hasBabySeat: false, hasGPS: true, minAge: 30,
-    description: 'Le trident de retour au sommet.'
-  },
-  {
-    id: '15', brand: 'Cadillac', model: 'Escalade V', year: 2024, category: 'SUV XXL',
-    image: '/images/suv_car.png', pricePerDay: 210000, seats: 7, transmission: 'Automatique',
-    fuel: 'Essence', hasBabySeat: true, hasGPS: true, minAge: 25,
-    description: 'L\'Amérique en mode XXL et supercharged.'
-  },
-  {
-    id: '16', brand: 'Bugatti', model: 'Chiron', year: 2022, category: 'Hypercar',
-    image: '/images/sport_car.png', pricePerDay: 1500000, seats: 2, transmission: 'Automatique',
-    fuel: 'Essence', hasBabySeat: false, hasGPS: true, minAge: 40,
-    description: 'L\'ultime machine de vitesse.'
-  },
-  // VÉHICULES GAMME ACCESSIBLE (Clio, Peugeot, etc.)
-  {
-    id: '17', brand: 'Peugeot', model: '208', year: 2023, category: 'Citadine',
-    image: '/images/city_car.png', pricePerDay: 30000, seats: 5, transmission: 'Manuelle',
-    fuel: 'Essence', hasBabySeat: true, hasGPS: true, minAge: 21,
-    description: 'La citadine préférée des français. Compacte et stylée.'
-  },
-  {
-    id: '18', brand: 'Renault', model: 'Clio V', year: 2023, category: 'Citadine',
-    image: '/images/city_car.png', pricePerDay: 25000, seats: 5, transmission: 'Manuelle',
-    fuel: 'Diesel', hasBabySeat: true, hasGPS: true, minAge: 21,
-    description: 'Polyvalente et confortable, idéale pour la ville.'
-  },
-  {
-    id: '19', brand: 'Toyota', model: 'Corolla', year: 2022, category: 'Berline',
-    image: '/images/sedan_car.png', pricePerDay: 40000, seats: 5, transmission: 'Automatique',
-    fuel: 'Hybride', hasBabySeat: true, hasGPS: true, minAge: 23,
-    description: 'La fiabilité légendaire avec une consommation minimale.'
-  },
-  {
-    id: '20', brand: 'Dacia', model: 'Duster', year: 2023, category: 'SUV Éco',
-    image: '/images/compact_suv.png', pricePerDay: 35000, seats: 5, transmission: 'Manuelle',
-    fuel: 'Diesel', hasBabySeat: true, hasGPS: true, minAge: 23,
-    description: 'Le SUV robuste et accessible pour l\'aventure.'
-  },
-  {
-    id: '21', brand: 'Hyundai', model: 'Tucson', year: 2023, category: 'SUV Compact',
-    image: '/images/compact_suv.png', pricePerDay: 50000, seats: 5, transmission: 'Automatique',
-    fuel: 'Essence', hasBabySeat: true, hasGPS: true, minAge: 25,
-    description: 'Design futuriste et confort premium pour la famille.'
-  },
-  {
-    id: '22', brand: 'Kia', model: 'Picanto', year: 2023, category: 'Citadine',
-    image: '/images/city_car.png', pricePerDay: 20000, seats: 4, transmission: 'Manuelle',
-    fuel: 'Essence', hasBabySeat: false, hasGPS: false, minAge: 18,
-    description: 'La petite citadine nerveuse pour se faufiler partout.'
-  },
-  {
-    id: '23', brand: 'Citroën', model: 'C3', year: 2023, category: 'Citadine',
-    image: '/images/city_car.png', pricePerDay: 28000, seats: 5, transmission: 'Manuelle',
-    fuel: 'Essence', hasBabySeat: true, hasGPS: true, minAge: 21,
-    description: 'Le confort Citroën dans un format compact.'
-  },
-  {
-    id: '24', brand: 'Volkswagen', model: 'Polo', year: 2022, category: 'Citadine',
-    image: '/images/city_car.png', pricePerDay: 32000, seats: 5, transmission: 'Automatique',
-    fuel: 'Essence', hasBabySeat: true, hasGPS: true, minAge: 21,
-    description: 'La qualité allemande en format poche.'
-  }
-];
+// MOCK DATA REMOVED - NOW FETCHING FROM API
+import { vehicleService } from '../services/vehicleService';
+
 
 export default function Home() {
   const navigate = useNavigate();
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Fetch vehicles from API
+  React.useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        const data = await vehicleService.getAllVehicles();
+        // The API returns a Page object, so we need to access data.content
+        const vehicleList = data.content || data;
+        const mappedVehicles = vehicleList.map((v: any) => ({
+          id: v.id,
+          brand: v.brand,
+          model: v.model,
+          year: v.year,
+          category: v.category,
+          image: v.images && v.images.length > 0 ? v.images[0] : '/images/default_car.png',
+          pricePerDay: v.dailyPrice,
+          seats: v.seats,
+          transmission: v.transmission,
+          fuel: v.fuelType,
+          hasBabySeat: v.babySeat,
+          hasGPS: true, // Default to true map
+          minAge: 25, // Default to 25 map
+          description: v.description
+        }));
+        setVehicles(mappedVehicles);
+      } catch (error) {
+        console.error('Failed to fetch vehicles:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVehicles();
+  }, []);
+
   // Filter vehicles logic
-  const filteredVehicles = GENERATED_VEHICLES.filter(vehicle =>
+  const filteredVehicles = vehicles.filter(vehicle =>
     vehicle.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
     vehicle.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
     vehicle.category.toLowerCase().includes(searchQuery.toLowerCase())
@@ -214,7 +105,22 @@ export default function Home() {
                 <a href="#about" className="text-gray-300 hover:text-yellow-400 text-sm font-medium transition-colors">A Propos</a>
               </div>
               <button
-                onClick={() => isConnected ? navigate('/dashboard/client') : navigate('/login')}
+                onClick={() => {
+                  if (isConnected) {
+                    const user = JSON.parse(localStorage.getItem('user') || '{}');
+                    const role = user.role || 'CLIENT';
+                    const dashboardRoutes: Record<string, string> = {
+                      'SUPER_ADMIN': '/dashboard/superadmin',
+                      'ADMIN': '/dashboard/admin',
+                      'MANAGER': '/dashboard/manager',
+                      'AGENT': '/dashboard/agent',
+                      'CLIENT': '/dashboard/client'
+                    };
+                    navigate(dashboardRoutes[role] || '/dashboard/client');
+                  } else {
+                    navigate('/login');
+                  }
+                }}
                 className="bg-yellow-400 hover:bg-yellow-300 text-black px-5 py-2 rounded-full font-bold text-sm transition-all transform hover:scale-105 shadow-[0_4px_14px_0_rgba(250,204,21,0.39)] flex items-center gap-2 whitespace-nowrap"
               >
                 {isConnected ? 'Mon Espace' : 'Connexion'} <ArrowRight className="w-4 h-4" />
@@ -222,19 +128,19 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </nav>
+      </nav >
 
       {/* HERO SECTION */}
-      <div className="relative h-screen flex items-center">
+      < div className="relative h-screen flex items-center" >
         {/* Background Image */}
-        <div className="absolute inset-0 z-0">
+        < div className="absolute inset-0 z-0" >
           <img
             src="/images/hero.png"
             alt="Luxury Showroom"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/50 to-transparent"></div>
-        </div>
+        </div >
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-16">
           <div className="max-w-2xl">
@@ -259,10 +165,10 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </div>
+      </div >
 
       {/* FEATURED FLEET */}
-      <section id="fleet" className="py-24 bg-zinc-900">
+      < section id="fleet" className="py-24 bg-zinc-900" >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-black text-white italic mb-4">NOTRE COLLECTION <span className="text-yellow-400 uppercase">Elite</span></h2>
@@ -319,12 +225,12 @@ export default function Home() {
             )}
           </div>
         </div>
-      </section>
+      </section >
 
       {/* WHY US */}
-      <section className="py-24 bg-white relative overflow-hidden">
+      < section className="py-24 bg-white relative overflow-hidden" >
         {/* Decorative BG */}
-        <div className="absolute top-0 right-0 w-1/3 h-full bg-gray-50 skew-x-12 translate-x-32 z-0"></div>
+        < div className="absolute top-0 right-0 w-1/3 h-full bg-gray-50 skew-x-12 translate-x-32 z-0" ></div >
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -359,12 +265,12 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </section >
 
       {/* ABOUT US / STORY SECTION */}
-      <section id="about" className="py-24 bg-black relative overflow-hidden">
+      < section id="about" className="py-24 bg-black relative overflow-hidden" >
         {/* Background Elements */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-yellow-400 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
+        < div className="absolute top-0 right-0 w-[500px] h-[500px] bg-yellow-400 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse" ></div >
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-white rounded-full mix-blend-overlay filter blur-3xl opacity-5"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -414,10 +320,10 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </section >
 
       {/* FOOTER */}
-      <footer className="bg-black text-white border-t border-white/10 pt-20 pb-10" id="contact">
+      < footer className="bg-black text-white border-t border-white/10 pt-20 pb-10" id="contact" >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
             <div>
@@ -451,14 +357,15 @@ export default function Home() {
             © 2024 ACA Locations De Voitures. All rights reserved. Designed for Excellence.
           </div>
         </div>
-      </footer>
+      </footer >
 
       {/* MODAL */}
-      <VehicleDetailModal
+      < VehicleDetailModal
         vehicle={selectedVehicle!}
-        isOpen={!!selectedVehicle}
+        isOpen={!!selectedVehicle
+        }
         onClose={() => setSelectedVehicle(null)}
       />
-    </div>
+    </div >
   );
 }

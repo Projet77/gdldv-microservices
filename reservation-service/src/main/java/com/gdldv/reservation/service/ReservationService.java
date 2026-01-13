@@ -43,6 +43,22 @@ public class ReservationService {
         return reservationRepository.findByUserId(userId);
     }
 
+    public List<ReservationResponse> getReservationsByUserIdWithVehicle(Long userId) {
+        List<Reservation> reservations = reservationRepository.findByUserId(userId);
+        return reservations.stream()
+                .map(reservation -> {
+                    VehicleDTO vehicle = null;
+                    try {
+                        vehicle = vehicleClient.getVehicleById(reservation.getVehicleId());
+                    } catch (Exception e) {
+                        log.warn("Could not fetch vehicle {} for reservation {}",
+                                reservation.getVehicleId(), reservation.getId());
+                    }
+                    return mapToResponse(reservation, vehicle);
+                })
+                .collect(java.util.stream.Collectors.toList());
+    }
+
     public List<Reservation> getReservationsByVehicleId(Long vehicleId) {
         return reservationRepository.findByVehicleId(vehicleId);
     }
@@ -112,7 +128,7 @@ public class ReservationService {
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .totalPrice(totalPrice)
-                .status(ReservationStatus.PENDING)
+                .status(ReservationStatus.PENDING) // Waiting for admin/manager confirmation
                 .options(request.getOptions())
                 .notes(request.getNotes())
                 .build();
@@ -223,6 +239,15 @@ public class ReservationService {
         reservation.setStatus(ReservationStatus.CONFIRMED);
         reservationRepository.save(reservation);
         log.info("Reservation {} confirmed", id);
+    }
+
+    @Transactional
+    public void startReservation(Long id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + id));
+        reservation.setStatus(ReservationStatus.ACTIVE);
+        reservationRepository.save(reservation);
+        log.info("Reservation {} started", id);
     }
 
     @Transactional

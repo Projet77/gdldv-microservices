@@ -10,17 +10,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "vehicle-service", url = "${feign.client.config.vehicle-service.url}")
 public interface VehicleClient {
 
-    @GetMapping("/vehicle-service/vehicles/{id}")
-    VehicleDTO getVehicleById(@PathVariable Long id);
+    @GetMapping("/api/v1/vehicles/{id}")
+    VehicleDTO getVehicleById(@PathVariable("id") Long id);
 
-    @GetMapping("/vehicle-service/vehicles/status/{status}")
-    VehicleDTO[] getVehiclesByStatus(@PathVariable String status);
+    @GetMapping("/api/v1/vehicles/status/{status}")
+    VehicleDTO[] getVehiclesByStatus(@PathVariable("status") String status);
 
-    @GetMapping("/vehicle-service/vehicles")
+    @GetMapping("/api/v1/vehicles")
     Page<VehicleDTO> searchVehicles(
-        @RequestParam(required = false) String category,
-        @RequestParam(required = false) Double minPrice,
-        @RequestParam(required = false) Double maxPrice,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size);
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size);
 }

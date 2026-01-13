@@ -15,17 +15,12 @@ public class CorsConfig {
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration corsConfig = new CorsConfiguration();
 
-        // Allow frontend origins
-        corsConfig.setAllowedOrigins(Arrays.asList(
-            "http://localhost:3000",
-            "http://localhost:4200",
-            "http://localhost:8080"
-        ));
+        // Allow all origins for development
+        corsConfig.setAllowedOriginPatterns(Arrays.asList("*"));
 
         // Allow all HTTP methods including PATCH
         corsConfig.setAllowedMethods(Arrays.asList(
-            "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
-        ));
+                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 
         // Allow all headers
         corsConfig.setAllowedHeaders(Arrays.asList("*"));

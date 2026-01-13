@@ -64,9 +64,9 @@ public class Vehicle {
 
     private Boolean babySeat;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "vehicle_images", joinColumns = @JoinColumn(name = "vehicle_id"))
-    @Column(name = "image_url")
+    @Column(name = "image_url", columnDefinition = "LONGTEXT")
     @Builder.Default
     private List<String> images = new ArrayList<>();
 

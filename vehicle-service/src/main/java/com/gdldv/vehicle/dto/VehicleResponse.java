@@ -28,7 +28,7 @@ public class VehicleResponse {
     private String transmission;
     private String description;
     private VehicleStatus status;
-    private VehicleStatus status;
+
     private Integer seats;
     private Boolean babySeat;
     private List<String> images;
